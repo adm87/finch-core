@@ -39,6 +39,25 @@ func NewInvalidArgumentError(msg string) InvalidArgumentError {
 }
 
 // =================================================================
+// IO Error
+// =================================================================
+
+type IOError string
+
+func (e IOError) Error() string {
+	return string(e)
+}
+
+func IsIOError(err error) bool {
+	_, ok := err.(IOError)
+	return ok
+}
+
+func NewIOError(msg string) IOError {
+	return IOError("io: " + msg)
+}
+
+// =================================================================
 // Nil Error
 // =================================================================
 
@@ -74,6 +93,25 @@ func IsNotFoundError(err error) bool {
 
 func NewNotFoundError(msg string) NotFoundError {
 	return NotFoundError("not found: " + msg)
+}
+
+// =================================================================
+// Parallel Error
+// =================================================================
+
+type ParallelError string
+
+func (e ParallelError) Error() string {
+	return string(e)
+}
+
+func IsParallelError(err error) bool {
+	_, ok := err.(ParallelError)
+	return ok
+}
+
+func NewParallelError(msg string) ParallelError {
+	return ParallelError("parallel: " + msg)
 }
 
 // =================================================================

@@ -23,5 +23,8 @@
 !hash/
 !hash/**/*
 
+!linq/
+!linq/**/*
+
 !time/
 !time/**/*

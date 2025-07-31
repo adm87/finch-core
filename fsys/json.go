@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-func ReadJson[T any](path string, data *T) error {
+func ReadJson[T any](path string, data T) error {
 	file, err := os.Open(path)
 	if err != nil {
 		return err
@@ -23,7 +23,7 @@ func ReadJson[T any](path string, data *T) error {
 	return nil
 }
 
-func WriteJson[T any](path string, data *T) error {
+func WriteJson[T any](path string, data T) error {
 	file, err := os.Create(path)
 	if err != nil {
 		return err
@@ -42,7 +42,7 @@ func WriteJson[T any](path string, data *T) error {
 	return nil
 }
 
-func WriteJsonIndent[T any](path string, data *T) error {
+func WriteJsonIndent[T any](path string, data T) error {
 	file, err := os.Create(path)
 	if err != nil {
 		return err
