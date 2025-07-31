@@ -31,6 +31,25 @@ func WriteJson[T any](path string, data *T) error {
 	defer file.Close()
 
 	encoder := json.NewEncoder(file)
+
+	if err := encoder.Encode(data); err != nil {
+		return err
+	}
+
+	if err := file.Sync(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func WriteJsonIndent[T any](path string, data *T) error {
+	file, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	encoder := json.NewEncoder(file)
 	encoder.SetIndent("", "  ")
 
 	if err := encoder.Encode(data); err != nil {

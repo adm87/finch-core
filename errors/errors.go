@@ -75,3 +75,22 @@ func IsNotFoundError(err error) bool {
 func NewNotFoundError(msg string) NotFoundError {
 	return NotFoundError("not found: " + msg)
 }
+
+// =================================================================
+// Security Error
+// =================================================================
+
+type SecurityError string
+
+func (e SecurityError) Error() string {
+	return string(e)
+}
+
+func IsSecurityError(err error) bool {
+	_, ok := err.(SecurityError)
+	return ok
+}
+
+func NewSecurityError(msg string) SecurityError {
+	return SecurityError("security: " + msg)
+}

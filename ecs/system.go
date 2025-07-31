@@ -6,6 +6,14 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
+// PrioritizedSystem is used for wrapping an instance of a system with an execution priority.
+//
+// Lower priorities are executed first.
+type PrioritizedSystem[T System] struct {
+	Sys  T
+	Prio int
+}
+
 // SystemType is a unique identifier for a system type.
 type SystemType hash.Hash
 
