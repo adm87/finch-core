@@ -1,14 +1,17 @@
 package ecs
 
 import (
-	"hash"
-	"time"
-
+	"github.com/adm87/finch-core/hash"
+	"github.com/adm87/finch-core/time"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
 // SystemType is a unique identifier for a system type.
 type SystemType hash.Hash
+
+func (t SystemType) IsNil() bool {
+	return t == 0
+}
 
 // System is an interface that represents a system in the ECS framework.
 type System interface {

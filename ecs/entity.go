@@ -9,6 +9,10 @@ import (
 // EntityID is a unique identifier for an entity in the ECS framework.
 type EntityID uuid.UUID
 
+func (e EntityID) IsNil() bool {
+	return e == EntityID(uuid.Nil)
+}
+
 type Entity struct {
 	id         EntityID
 	components map[ComponentType]Component

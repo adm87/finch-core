@@ -20,6 +20,25 @@ func NewDuplicateError(msg string) DuplicateError {
 }
 
 // =================================================================
+// Invalid Argument Error
+// =================================================================
+
+type InvalidArgumentError string
+
+func (e InvalidArgumentError) Error() string {
+	return string(e)
+}
+
+func IsInvalidArgumentError(err error) bool {
+	_, ok := err.(InvalidArgumentError)
+	return ok
+}
+
+func NewInvalidArgumentError(msg string) InvalidArgumentError {
+	return InvalidArgumentError("invalid argument: " + msg)
+}
+
+// =================================================================
 // Nil Error
 // =================================================================
 
