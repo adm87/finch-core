@@ -1,9 +1,11 @@
 package hash
 
+var SetEntry struct{} = struct{}{}
+
 type HashSet[T comparable] map[T]struct{}
 
 func (s HashSet[T]) Add(item T) {
-	s[item] = struct{}{}
+	s[item] = SetEntry
 }
 
 func (s HashSet[T]) Contains(item T) bool {

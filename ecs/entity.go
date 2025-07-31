@@ -80,6 +80,9 @@ func (e *Entity) AddTags(tags ...string) *Entity {
 		if tag == "" {
 			panic(errors.NewNilError("cannot add empty tag to entity"))
 		}
+		if e.tags.Contains(tag) {
+			panic(errors.NewDuplicateError("tag already exists: " + tag))
+		}
 		e.tags.Add(tag)
 	}
 	return e
