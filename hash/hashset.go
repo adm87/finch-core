@@ -22,3 +22,11 @@ func (s HashSet[T]) Clear() {
 		delete(s, k)
 	}
 }
+
+func MakeSetFrom[T comparable](items ...T) HashSet[T] {
+	set := make(HashSet[T])
+	for _, item := range items {
+		set.Add(item)
+	}
+	return set
+}
