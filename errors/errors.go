@@ -56,3 +56,22 @@ func IsNilError(err error) bool {
 func NewNilError(msg string) NilError {
 	return NilError("nil: " + msg)
 }
+
+// =================================================================
+// Not Found Error
+// =================================================================
+
+type NotFoundError string
+
+func (e NotFoundError) Error() string {
+	return string(e)
+}
+
+func IsNotFoundError(err error) bool {
+	_, ok := err.(NotFoundError)
+	return ok
+}
+
+func NewNotFoundError(msg string) NotFoundError {
+	return NotFoundError("not found: " + msg)
+}
