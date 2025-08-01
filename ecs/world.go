@@ -42,13 +42,13 @@ func (w *World) RegisterSystems(systems map[System]int) (*World, error) {
 		if _, exists := w.systemsByType[system.Type()]; exists {
 			return nil, errors.NewDuplicateError("system already registered: " + fmt.Sprintf("%v", system.Type()))
 		}
-		if sys := system.(UpdateSystem); sys != nil {
+		if sys, ok := system.(UpdateSystem); ok {
 			w.updateSystems = append(w.updateSystems, PrioritizedSystem[UpdateSystem]{Sys: sys, Prio: prio})
 			slices.SortFunc(w.updateSystems, func(a, b PrioritizedSystem[UpdateSystem]) int {
 				return a.Prio - b.Prio
 			})
 		}
-		if sys := system.(RenderSystem); sys != nil {
+		if sys, ok := system.(RenderSystem); ok {
 			w.renderSystems = append(w.renderSystems, PrioritizedSystem[RenderSystem]{Sys: sys, Prio: prio})
 			slices.SortFunc(w.renderSystems, func(a, b PrioritizedSystem[RenderSystem]) int {
 				return a.Prio - b.Prio
