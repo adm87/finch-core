@@ -1,6 +1,25 @@
 package errors
 
 // =================================================================
+// Ambiguous Error
+// =================================================================
+
+type AmbiguousError string
+
+func (e AmbiguousError) Error() string {
+	return string(e)
+}
+
+func IsAmbiguousError(err error) bool {
+	_, ok := err.(AmbiguousError)
+	return ok
+}
+
+func NewAmbiguousError(msg string) AmbiguousError {
+	return AmbiguousError("ambiguous: " + msg)
+}
+
+// =================================================================
 // Duplicate Error
 // =================================================================
 

@@ -63,6 +63,17 @@ func (e *Entity) RemoveComponents(types ...ComponentType) (*Entity, error) {
 	return e, nil
 }
 
+func (e *Entity) GetComponent(t ComponentType) (Component, bool, error) {
+	if t.IsNil() {
+		return nil, false, errors.NewNilError("cannot get component with nil type from entity")
+	}
+	component, exists := e.components[t]
+	if !exists {
+		return nil, false, errors.NewNotFoundError("component not found: " + t.String())
+	}
+	return component, true, nil
+}
+
 func (e *Entity) HasComponents(types ...ComponentType) (bool, error) {
 	for _, t := range types {
 		if t.IsNil() {

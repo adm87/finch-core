@@ -33,12 +33,12 @@ type System interface {
 type UpdateSystem interface {
 	System
 
-	Update(entities []Entity, t time.Time) error
+	Update(entities []*Entity, t time.Time) error
 }
 
 // RenderSystem is an interface for systems that need to render entities.
 type RenderSystem interface {
 	System
 
-	Render(entities []Entity, buffer *ebiten.Image, view ebiten.GeoM) error
+	Render(entities []*Entity, buffer *ebiten.Image, view ebiten.GeoM) error
 }

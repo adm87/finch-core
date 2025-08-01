@@ -14,6 +14,7 @@ type World struct {
 	systemsByType map[SystemType]System
 	updateSystems []PrioritizedSystem[UpdateSystem]
 	renderSystems []PrioritizedSystem[RenderSystem]
+	view          ebiten.GeoM
 }
 
 func NewWorld() *World {
@@ -22,6 +23,7 @@ func NewWorld() *World {
 		systemsByType: make(map[SystemType]System),
 		updateSystems: []PrioritizedSystem[UpdateSystem]{},
 		renderSystems: []PrioritizedSystem[RenderSystem]{},
+		view:          ebiten.GeoM{},
 	}
 }
 
@@ -103,7 +105,7 @@ func (w *World) GetSystem(systemType SystemType) (System, bool, error) {
 
 func (w *World) Update(t time.Time) error {
 	for _, system := range w.updateSystems {
-		entities, err := w.getEntitiesForSystem(system.Sys)
+		entities, err := w.internal_filter_entities(system.Sys.Filter())
 		if err != nil {
 			return err
 		}
@@ -114,22 +116,36 @@ func (w *World) Update(t time.Time) error {
 	return nil
 }
 
-func (w *World) Render(buffer *ebiten.Image, view ebiten.GeoM) error {
+func (w *World) Render(screen *ebiten.Image) error {
 	for _, system := range w.renderSystems {
-		entities, err := w.getEntitiesForSystem(system.Sys)
+		entities, err := w.internal_filter_entities(system.Sys.Filter())
 		if err != nil {
 			return err
 		}
-		if err := system.Sys.Render(entities, buffer, view); err != nil {
+		if err := system.Sys.Render(entities, screen, w.view); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func (w *World) getEntitiesForSystem(system System) ([]Entity, error) {
-	filter := system.Filter()
-	entities := make([]Entity, 0, len(w.entities))
+func (w *World) Clear() {
+	w.entities = make(map[EntityID]*Entity)
+	w.updateSystems = []PrioritizedSystem[UpdateSystem]{}
+	w.renderSystems = []PrioritizedSystem[RenderSystem]{}
+	w.systemsByType = make(map[SystemType]System)
+}
+
+func (w *World) View() ebiten.GeoM {
+	return w.view
+}
+
+func (w *World) SetView(view ebiten.GeoM) {
+	w.view = view
+}
+
+func (w *World) internal_filter_entities(filter []ComponentType) ([]*Entity, error) {
+	entities := make([]*Entity, 0, len(w.entities))
 
 	for _, entity := range w.entities {
 		hasComponent, err := entity.HasComponents(filter...)
@@ -139,15 +155,8 @@ func (w *World) getEntitiesForSystem(system System) ([]Entity, error) {
 		if !hasComponent {
 			continue
 		}
-		entities = append(entities, *entity)
+		entities = append(entities, entity)
 	}
 
 	return entities, nil
-}
-
-func (w *World) Clear() {
-	w.entities = make(map[EntityID]*Entity)
-	w.updateSystems = []PrioritizedSystem[UpdateSystem]{}
-	w.renderSystems = []PrioritizedSystem[RenderSystem]{}
-	w.systemsByType = make(map[SystemType]System)
 }
