@@ -96,6 +96,25 @@ func NewNotFoundError(msg string) NotFoundError {
 }
 
 // =================================================================
+// Not Implemented Error
+// =================================================================
+
+type NotImplementedError string
+
+func (e NotImplementedError) Error() string {
+	return string(e)
+}
+
+func IsNotImplementedError(err error) bool {
+	_, ok := err.(NotImplementedError)
+	return ok
+}
+
+func NewNotImplementedError(msg string) NotImplementedError {
+	return NotImplementedError("not implemented: " + msg)
+}
+
+// =================================================================
 // Parallel Error
 // =================================================================
 
