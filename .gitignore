@@ -26,5 +26,8 @@
 !linq/
 !linq/**/*
 
+!math/
+!math/**/*
+
 !time/
 !time/**/*

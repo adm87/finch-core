@@ -2,6 +2,10 @@ package geometry
 
 import "fmt"
 
+// =================================================================
+// Rectangle
+// =================================================================
+
 type Rectangle struct {
 	X, Y, Width, Height float32
 }
