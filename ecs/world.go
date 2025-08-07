@@ -11,8 +11,9 @@ import (
 type World struct {
 	entities           map[EntityID]*Entity
 	systemsByType      map[SystemType]System
+	earlyUpdateSystems []OrderedSystem[EarlyUpdateSystem]
 	fixedUpdateSystems []OrderedSystem[FixedUpdateSystem]
-	updateSystems      []OrderedSystem[UpdateSystem]
+	lateUpdateSystems  []OrderedSystem[LateUpdateSystem]
 	renderSystems      []OrderedSystem[RenderSystem]
 	view               ebiten.GeoM
 }
@@ -21,8 +22,9 @@ func NewWorld() *World {
 	return &World{
 		entities:           make(map[EntityID]*Entity),
 		systemsByType:      make(map[SystemType]System),
+		earlyUpdateSystems: make([]OrderedSystem[EarlyUpdateSystem], 0),
 		fixedUpdateSystems: make([]OrderedSystem[FixedUpdateSystem], 0),
-		updateSystems:      make([]OrderedSystem[UpdateSystem], 0),
+		lateUpdateSystems:  make([]OrderedSystem[LateUpdateSystem], 0),
 		renderSystems:      make([]OrderedSystem[RenderSystem], 0),
 		view:               ebiten.GeoM{},
 	}
@@ -46,23 +48,30 @@ func (w *World) RegisterSystems(systems map[System]int) (*World, error) {
 			return nil, errors.NewDuplicateError("system already registered: " + fmt.Sprintf("%v", system.Type()))
 		}
 
+		earlyUpdateSystem, isEarly := system.(EarlyUpdateSystem)
 		fixUpdateSystem, isFixed := system.(FixedUpdateSystem)
-		updateSystem, isUpdate := system.(UpdateSystem)
+		lateUpdateSystem, isLate := system.(LateUpdateSystem)
 		renderSystem, isRender := system.(RenderSystem)
 
-		if !isFixed && !isUpdate && !isRender {
-			return nil, errors.NewInvalidArgumentError("system must implement at least one of FixedUpdateSystem, UpdateSystem or RenderSystem interfaces")
+		if !isEarly && !isFixed && !isLate && !isRender {
+			return nil, errors.NewInvalidArgumentError("system must implement at least one of EarlyUpdateSystem, FixedUpdateSystem, LateUpdateSystem or RenderSystem interfaces")
 		}
 
+		if isEarly {
+			w.earlyUpdateSystems = append(w.earlyUpdateSystems, OrderedSystem[EarlyUpdateSystem]{Sys: earlyUpdateSystem, Order: prio})
+			slices.SortFunc(w.earlyUpdateSystems, func(a, b OrderedSystem[EarlyUpdateSystem]) int {
+				return a.Order - b.Order
+			})
+		}
 		if isFixed {
 			w.fixedUpdateSystems = append(w.fixedUpdateSystems, OrderedSystem[FixedUpdateSystem]{Sys: fixUpdateSystem, Order: prio})
 			slices.SortFunc(w.fixedUpdateSystems, func(a, b OrderedSystem[FixedUpdateSystem]) int {
 				return a.Order - b.Order
 			})
 		}
-		if isUpdate {
-			w.updateSystems = append(w.updateSystems, OrderedSystem[UpdateSystem]{Sys: updateSystem, Order: prio})
-			slices.SortFunc(w.updateSystems, func(a, b OrderedSystem[UpdateSystem]) int {
+		if isLate {
+			w.lateUpdateSystems = append(w.lateUpdateSystems, OrderedSystem[LateUpdateSystem]{Sys: lateUpdateSystem, Order: prio})
+			slices.SortFunc(w.lateUpdateSystems, func(a, b OrderedSystem[LateUpdateSystem]) int {
 				return a.Order - b.Order
 			})
 		}
@@ -120,39 +129,52 @@ func (w *World) GetSystem(systemType SystemType) (System, bool, error) {
 	return system, exists, nil
 }
 
-func (w *World) FixedUpdate() error {
+func (w *World) EarlyUpdate(deltaSeconds float64) error {
+	for _, system := range w.earlyUpdateSystems {
+		entities, err := w.internal_filter_entities(system.Sys.Filter())
+		if err != nil {
+			return err
+		}
+		if err := system.Sys.EarlyUpdate(entities, deltaSeconds); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (w *World) FixedUpdate(fixedDeltaSeconds float64) error {
 	for _, system := range w.fixedUpdateSystems {
 		entities, err := w.internal_filter_entities(system.Sys.Filter())
 		if err != nil {
 			return err
 		}
-		if err := system.Sys.FixedUpdate(entities); err != nil {
+		if err := system.Sys.FixedUpdate(entities, fixedDeltaSeconds); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func (w *World) Update() error {
-	for _, system := range w.updateSystems {
+func (w *World) LateUpdate(deltaSeconds float64) error {
+	for _, system := range w.lateUpdateSystems {
 		entities, err := w.internal_filter_entities(system.Sys.Filter())
 		if err != nil {
 			return err
 		}
-		if err := system.Sys.Update(entities); err != nil {
+		if err := system.Sys.LateUpdate(entities, deltaSeconds); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func (w *World) Render(screen *ebiten.Image) error {
+func (w *World) Render(screen *ebiten.Image, interpolation float64) error {
 	for _, system := range w.renderSystems {
 		entities, err := w.internal_filter_entities(system.Sys.Filter())
 		if err != nil {
 			return err
 		}
-		if err := system.Sys.Render(entities, screen, w.view); err != nil {
+		if err := system.Sys.Render(entities, screen, w.view, interpolation); err != nil {
 			return err
 		}
 	}
@@ -161,7 +183,9 @@ func (w *World) Render(screen *ebiten.Image) error {
 
 func (w *World) Clear() {
 	w.entities = make(map[EntityID]*Entity)
-	w.updateSystems = []OrderedSystem[UpdateSystem]{}
+	w.earlyUpdateSystems = []OrderedSystem[EarlyUpdateSystem]{}
+	w.fixedUpdateSystems = []OrderedSystem[FixedUpdateSystem]{}
+	w.lateUpdateSystems = []OrderedSystem[LateUpdateSystem]{}
 	w.renderSystems = []OrderedSystem[RenderSystem]{}
 	w.systemsByType = make(map[SystemType]System)
 }

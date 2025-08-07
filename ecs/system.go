@@ -28,23 +28,38 @@ type System interface {
 	Type() SystemType
 }
 
-// UpdateSystem is an interface for systems that need to update entities.
-type UpdateSystem interface {
+// EarlyUpdateSystem is an interface for systems that need to perform early updates on entities.
+//
+// Early updates uses a variable delta time and is called before FixedUpdate and LateUpdate.
+type EarlyUpdateSystem interface {
 	System
 
-	Update(entities []*Entity) error
+	EarlyUpdate(entities []*Entity, deltaSeconds float64) error
 }
 
-// FixedUpdateSystem is an interface for systems that need to perform fixed updates on entities.
+// FixedUpdateSystem is an interface for systems that need to perform fixed updates on entities. Recommended for physics and similar systems.
+//
+// Fixed updates uses a fixed delta time and is called after EarlyUpdate and before LateUpdate.
+//
+// Since fixed updates are called on fixed intervales, it's possible that FixedUpdate is called zero or more times per frame.
 type FixedUpdateSystem interface {
 	System
 
-	FixedUpdate(entities []*Entity) error
+	FixedUpdate(entities []*Entity, fixedDeltaSeconds float64) error
+}
+
+// LateUpdateSystem is an interface for systems that need to perform late updates on entities.
+//
+// Late updates uses a variable delta time and is called after FixedUpdate.
+type LateUpdateSystem interface {
+	System
+
+	LateUpdate(entities []*Entity, deltaSeconds float64) error
 }
 
 // RenderSystem is an interface for systems that need to render entities.
 type RenderSystem interface {
 	System
 
-	Render(entities []*Entity, buffer *ebiten.Image, view ebiten.GeoM) error
+	Render(entities []*Entity, buffer *ebiten.Image, view ebiten.GeoM, interpolation float64) error
 }
