@@ -9,20 +9,22 @@ import (
 )
 
 type World struct {
-	entities      map[EntityID]*Entity
-	systemsByType map[SystemType]System
-	updateSystems []PrioritizedSystem[UpdateSystem]
-	renderSystems []PrioritizedSystem[RenderSystem]
-	view          ebiten.GeoM
+	entities           map[EntityID]*Entity
+	systemsByType      map[SystemType]System
+	fixedUpdateSystems []OrderedSystem[FixedUpdateSystem]
+	updateSystems      []OrderedSystem[UpdateSystem]
+	renderSystems      []OrderedSystem[RenderSystem]
+	view               ebiten.GeoM
 }
 
 func NewWorld() *World {
 	return &World{
-		entities:      make(map[EntityID]*Entity),
-		systemsByType: make(map[SystemType]System),
-		updateSystems: []PrioritizedSystem[UpdateSystem]{},
-		renderSystems: []PrioritizedSystem[RenderSystem]{},
-		view:          ebiten.GeoM{},
+		entities:           make(map[EntityID]*Entity),
+		systemsByType:      make(map[SystemType]System),
+		fixedUpdateSystems: make([]OrderedSystem[FixedUpdateSystem], 0),
+		updateSystems:      make([]OrderedSystem[UpdateSystem], 0),
+		renderSystems:      make([]OrderedSystem[RenderSystem], 0),
+		view:               ebiten.GeoM{},
 	}
 }
 
@@ -44,23 +46,30 @@ func (w *World) RegisterSystems(systems map[System]int) (*World, error) {
 			return nil, errors.NewDuplicateError("system already registered: " + fmt.Sprintf("%v", system.Type()))
 		}
 
+		fixUpdateSystem, isFixed := system.(FixedUpdateSystem)
 		updateSystem, isUpdate := system.(UpdateSystem)
 		renderSystem, isRender := system.(RenderSystem)
 
-		if !isUpdate && !isRender {
-			return nil, errors.NewInvalidArgumentError("system must implement at least one of UpdateSystem or RenderSystem interfaces")
+		if !isFixed && !isUpdate && !isRender {
+			return nil, errors.NewInvalidArgumentError("system must implement at least one of FixedUpdateSystem, UpdateSystem or RenderSystem interfaces")
 		}
 
+		if isFixed {
+			w.fixedUpdateSystems = append(w.fixedUpdateSystems, OrderedSystem[FixedUpdateSystem]{Sys: fixUpdateSystem, Order: prio})
+			slices.SortFunc(w.fixedUpdateSystems, func(a, b OrderedSystem[FixedUpdateSystem]) int {
+				return a.Order - b.Order
+			})
+		}
 		if isUpdate {
-			w.updateSystems = append(w.updateSystems, PrioritizedSystem[UpdateSystem]{Sys: updateSystem, Prio: prio})
-			slices.SortFunc(w.updateSystems, func(a, b PrioritizedSystem[UpdateSystem]) int {
-				return a.Prio - b.Prio
+			w.updateSystems = append(w.updateSystems, OrderedSystem[UpdateSystem]{Sys: updateSystem, Order: prio})
+			slices.SortFunc(w.updateSystems, func(a, b OrderedSystem[UpdateSystem]) int {
+				return a.Order - b.Order
 			})
 		}
 		if isRender {
-			w.renderSystems = append(w.renderSystems, PrioritizedSystem[RenderSystem]{Sys: renderSystem, Prio: prio})
-			slices.SortFunc(w.renderSystems, func(a, b PrioritizedSystem[RenderSystem]) int {
-				return a.Prio - b.Prio
+			w.renderSystems = append(w.renderSystems, OrderedSystem[RenderSystem]{Sys: renderSystem, Order: prio})
+			slices.SortFunc(w.renderSystems, func(a, b OrderedSystem[RenderSystem]) int {
+				return a.Order - b.Order
 			})
 		}
 
@@ -111,6 +120,19 @@ func (w *World) GetSystem(systemType SystemType) (System, bool, error) {
 	return system, exists, nil
 }
 
+func (w *World) FixedUpdate() error {
+	for _, system := range w.fixedUpdateSystems {
+		entities, err := w.internal_filter_entities(system.Sys.Filter())
+		if err != nil {
+			return err
+		}
+		if err := system.Sys.FixedUpdate(entities); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (w *World) Update() error {
 	for _, system := range w.updateSystems {
 		entities, err := w.internal_filter_entities(system.Sys.Filter())
@@ -139,8 +161,8 @@ func (w *World) Render(screen *ebiten.Image) error {
 
 func (w *World) Clear() {
 	w.entities = make(map[EntityID]*Entity)
-	w.updateSystems = []PrioritizedSystem[UpdateSystem]{}
-	w.renderSystems = []PrioritizedSystem[RenderSystem]{}
+	w.updateSystems = []OrderedSystem[UpdateSystem]{}
+	w.renderSystems = []OrderedSystem[RenderSystem]{}
 	w.systemsByType = make(map[SystemType]System)
 }
 

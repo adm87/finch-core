@@ -5,12 +5,12 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-// PrioritizedSystem is used for wrapping an instance of a system with an execution priority.
+// OrderedSystem is used for wrapping an instance of a system with an execution priority.
 //
 // Lower priorities are executed first.
-type PrioritizedSystem[T System] struct {
-	Sys  T
-	Prio int
+type OrderedSystem[T System] struct {
+	Sys   T
+	Order int
 }
 
 // SystemType is a unique identifier for a system type.
@@ -32,9 +32,14 @@ type System interface {
 type UpdateSystem interface {
 	System
 
-	FixedUpdate(entities []*Entity) error
-
 	Update(entities []*Entity) error
+}
+
+// FixedUpdateSystem is an interface for systems that need to perform fixed updates on entities.
+type FixedUpdateSystem interface {
+	System
+
+	FixedUpdate(entities []*Entity) error
 }
 
 // RenderSystem is an interface for systems that need to render entities.
