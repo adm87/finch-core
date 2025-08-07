@@ -2,7 +2,6 @@ package ecs
 
 import (
 	"github.com/adm87/finch-core/hash"
-	"github.com/adm87/finch-core/time"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -33,7 +32,9 @@ type System interface {
 type UpdateSystem interface {
 	System
 
-	Update(entities []*Entity, t time.Time) error
+	FixedUpdate(entities []*Entity) error
+
+	Update(entities []*Entity) error
 }
 
 // RenderSystem is an interface for systems that need to render entities.

@@ -5,7 +5,6 @@ import (
 	"slices"
 
 	"github.com/adm87/finch-core/errors"
-	"github.com/adm87/finch-core/time"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -44,18 +43,27 @@ func (w *World) RegisterSystems(systems map[System]int) (*World, error) {
 		if _, exists := w.systemsByType[system.Type()]; exists {
 			return nil, errors.NewDuplicateError("system already registered: " + fmt.Sprintf("%v", system.Type()))
 		}
-		if sys, ok := system.(UpdateSystem); ok {
-			w.updateSystems = append(w.updateSystems, PrioritizedSystem[UpdateSystem]{Sys: sys, Prio: prio})
+
+		updateSystem, isUpdate := system.(UpdateSystem)
+		renderSystem, isRender := system.(RenderSystem)
+
+		if !isUpdate && !isRender {
+			return nil, errors.NewInvalidArgumentError("system must implement at least one of UpdateSystem or RenderSystem interfaces")
+		}
+
+		if isUpdate {
+			w.updateSystems = append(w.updateSystems, PrioritizedSystem[UpdateSystem]{Sys: updateSystem, Prio: prio})
 			slices.SortFunc(w.updateSystems, func(a, b PrioritizedSystem[UpdateSystem]) int {
 				return a.Prio - b.Prio
 			})
 		}
-		if sys, ok := system.(RenderSystem); ok {
-			w.renderSystems = append(w.renderSystems, PrioritizedSystem[RenderSystem]{Sys: sys, Prio: prio})
+		if isRender {
+			w.renderSystems = append(w.renderSystems, PrioritizedSystem[RenderSystem]{Sys: renderSystem, Prio: prio})
 			slices.SortFunc(w.renderSystems, func(a, b PrioritizedSystem[RenderSystem]) int {
 				return a.Prio - b.Prio
 			})
 		}
+
 		w.systemsByType[system.Type()] = system
 	}
 	return w, nil
@@ -103,13 +111,13 @@ func (w *World) GetSystem(systemType SystemType) (System, bool, error) {
 	return system, exists, nil
 }
 
-func (w *World) Update(t time.Time) error {
+func (w *World) Update() error {
 	for _, system := range w.updateSystems {
 		entities, err := w.internal_filter_entities(system.Sys.Filter())
 		if err != nil {
 			return err
 		}
-		if err := system.Sys.Update(entities, t); err != nil {
+		if err := system.Sys.Update(entities); err != nil {
 			return err
 		}
 	}
