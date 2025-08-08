@@ -129,6 +129,25 @@ func (w *World) GetSystem(systemType SystemType) (System, bool, error) {
 	return system, exists, nil
 }
 
+func (w *World) Update(deltaSeconds, fixedDeltaSeconds float64, fixedUpdates int) error {
+	if err := w.EarlyUpdate(deltaSeconds); err != nil {
+		return err
+	}
+
+	for fixedUpdates > 0 {
+		if err := w.FixedUpdate(fixedDeltaSeconds); err != nil {
+			return err
+		}
+		fixedUpdates--
+	}
+
+	if err := w.LateUpdate(deltaSeconds); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (w *World) EarlyUpdate(deltaSeconds float64) error {
 	for _, system := range w.earlyUpdateSystems {
 		entities, err := w.internal_filter_entities(system.Sys.Filter())
