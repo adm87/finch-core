@@ -35,7 +35,7 @@ func NewWorld() *World {
 // Returns an error if any system is nil, has a nil type, or if a system with the same type is already registered.
 //
 // Systems are stored by type (UpdateSystem or RenderSystem) and executed in order of their priority (lower values run first).
-// If a system implements both UpdateSystem and RenderSystem, the same priority is used for both.
+// If a system implements multiple types, the same priority is used for all.
 func (w *World) RegisterSystems(systems map[System]int) (*World, error) {
 	for system, prio := range systems {
 		if system == nil {
@@ -199,6 +199,8 @@ func (w *World) SetView(view ebiten.GeoM) {
 }
 
 func (w *World) internal_filter_entities(filter []ComponentType) ([]*Entity, error) {
+	// TODO: this can be optimized
+
 	entities := make([]*Entity, 0, len(w.entities))
 
 	for _, entity := range w.entities {
