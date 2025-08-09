@@ -124,6 +124,7 @@ func (t *TransformComponent) LocalMatrix() ebiten.GeoM {
 
 func (t *TransformComponent) WorldMatrix() ebiten.GeoM {
 	if t.worldDirty {
+		// TODO: Implement world matrix calculation. Parent/Child relationships.
 		t.worldMatrix.Reset()
 		t.worldMatrix.Concat(t.LocalMatrix())
 		t.worldDirty = false

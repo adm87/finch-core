@@ -8,6 +8,9 @@
 !README.md
 !LICENSE
 
+!components/
+!components/**/*
+
 !ecs/
 !ecs/**/*
 
