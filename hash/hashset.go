@@ -51,7 +51,7 @@ func IntersectHashSets[T comparable](sets ...HashSet[T]) HashSet[T] {
 	}
 
 	// We'll sort the sets by smallest to largest to minimize work
-	slices.SortStableFunc(sets, func(a, b HashSet[T]) int {
+	slices.SortFunc(sets, func(a, b HashSet[T]) int {
 		return len(a) - len(b)
 	})
 
