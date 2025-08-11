@@ -29,6 +29,14 @@ func (s HashSet[T]) Clear() {
 	}
 }
 
+func (s HashSet[T]) First() (T, bool) {
+	for item := range s {
+		return item, true
+	}
+	var zero T
+	return zero, false
+}
+
 func MakeSetFrom[T comparable](items ...T) HashSet[T] {
 	set := make(HashSet[T])
 	for _, item := range items {
