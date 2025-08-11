@@ -20,6 +20,25 @@ func NewAmbiguousError(msg string) AmbiguousError {
 }
 
 // =================================================================
+// Conflict Error
+// =================================================================
+
+type ConflictError string
+
+func (e ConflictError) Error() string {
+	return string(e)
+}
+
+func IsConflictError(err error) bool {
+	_, ok := err.(ConflictError)
+	return ok
+}
+
+func NewConflictError(msg string) ConflictError {
+	return ConflictError("conflict: " + msg)
+}
+
+// =================================================================
 // Duplicate Error
 // =================================================================
 
