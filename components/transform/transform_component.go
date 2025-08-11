@@ -3,12 +3,11 @@ package transform
 import (
 	"github.com/adm87/finch-core/ecs"
 	"github.com/adm87/finch-core/geometry"
-	"github.com/adm87/finch-core/hash"
 	"github.com/adm87/finch-core/math"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-var TransformComponentType = ecs.ComponentType(hash.GetHashFromType[TransformComponent]())
+var TransformComponentType = ecs.NewComponentType[*TransformComponent]()
 
 type TransformComponent struct {
 	position geometry.Point64

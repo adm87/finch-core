@@ -19,6 +19,10 @@ func (t ComponentType) String() string {
 	return strconv.FormatUint(uint64(t), 10)
 }
 
+func NewComponentType[T Component]() ComponentType {
+	return ComponentType(hash.GetHashFromType[T]())
+}
+
 type Component interface {
 	// Dispose can be used to dereference any resources held by the component.
 	Dispose()

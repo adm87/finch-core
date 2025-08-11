@@ -2,6 +2,7 @@ package ecs
 
 import (
 	"slices"
+	"strconv"
 
 	"github.com/adm87/finch-core/errors"
 	"github.com/adm87/finch-core/hash"
@@ -13,6 +14,14 @@ type SystemType hash.Hash
 
 func (t SystemType) IsNil() bool {
 	return t == 0
+}
+
+func (t SystemType) String() string {
+	return strconv.FormatUint(uint64(t), 10)
+}
+
+func NewSystemType[T System]() SystemType {
+	return SystemType(hash.GetHashFromType[T]())
 }
 
 // System is an interface that represents a system in the ECS framework.
