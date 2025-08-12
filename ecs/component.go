@@ -30,3 +30,22 @@ type Component interface {
 	// Type returns the unique identifier for the component type.
 	Type() ComponentType
 }
+
+func GetComponent[T Component](world *ECSWorld, entity Entity, componentType ComponentType) (T, bool, error) {
+	var zero T
+
+	component, exists, err := world.GetComponent(entity, componentType)
+	if err != nil {
+		return zero, false, err
+	}
+	if !exists {
+		return zero, false, nil
+	}
+
+	typedComponent, ok := component.(T)
+	if !ok {
+		return zero, false, ErrComponentTypeMismatch
+	}
+
+	return typedComponent, ok, nil
+}
