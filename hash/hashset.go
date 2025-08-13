@@ -50,6 +50,10 @@ func IntersectHashSets[T comparable](sets ...HashSet[T]) HashSet[T] {
 		return make(HashSet[T])
 	}
 
+	if len(sets) == 1 {
+		return sets[0]
+	}
+
 	// We'll sort the sets by smallest to largest to minimize work
 	slices.SortFunc(sets, func(a, b HashSet[T]) int {
 		return len(a) - len(b)

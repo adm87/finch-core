@@ -146,23 +146,19 @@ func (w *ECSWorld) FilterEntitiesByComponents(componentTypes ...ComponentType) h
 		return w.entities
 	}
 
-	entities := make([]hash.HashSet[Entity], 0)
-
+	sets := make([]hash.HashSet[Entity], 0, len(componentTypes))
 	for _, ct := range componentTypes {
 		if ct.IsNil() {
 			return hash.HashSet[Entity]{}
 		}
-
 		set, ok := w.entitiesByComponentType[ct]
-
 		if !ok {
 			return hash.HashSet[Entity]{}
 		}
-
-		entities = append(entities, set)
+		sets = append(sets, set)
 	}
 
-	return hash.IntersectHashSets(entities...)
+	return hash.IntersectHashSets(sets...)
 }
 
 // =================================================================
