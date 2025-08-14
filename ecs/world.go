@@ -23,8 +23,8 @@ var (
 	ErrInvalidSystemRegistration = errors.NewInvalidArgumentError("system must implement at least one update or render interface")
 )
 
-// ECSWorld is set of registered systems, entities, and components
-type ECSWorld struct {
+// World is set of registered systems, entities, and components
+type World struct {
 	entities                hash.HashSet[Entity]
 	entitiesByComponentType map[ComponentType]hash.HashSet[Entity]
 	componentsByEntity      map[Entity]map[ComponentType]Component
@@ -35,8 +35,8 @@ type ECSWorld struct {
 	renderSystems           []OrderedSystem[RenderSystem]
 }
 
-func NewWorld() *ECSWorld {
-	return &ECSWorld{
+func NewWorld() *World {
+	return &World{
 		entities:                make(hash.HashSet[Entity]),
 		entitiesByComponentType: make(map[ComponentType]hash.HashSet[Entity]),
 		componentsByEntity:      make(map[Entity]map[ComponentType]Component),
@@ -53,7 +53,7 @@ func NewWorld() *ECSWorld {
 // =================================================================
 
 // NewEntity creates a new entity and adds it to the world.
-func (w *ECSWorld) NewEntity() Entity {
+func (w *World) NewEntity() Entity {
 	id := Entity(uuid.New())
 	w.entities.Add(id)
 	return id
@@ -62,7 +62,7 @@ func (w *ECSWorld) NewEntity() Entity {
 // NewEntityWithComponents creates a new entity with the given components and adds it to the world.
 //
 // If any of the components fail to be added, the entity will be removed from the world and a NilEntity is returned along with the error.
-func (w *ECSWorld) NewEntityWithComponents(components ...Component) (Entity, error) {
+func (w *World) NewEntityWithComponents(components ...Component) (Entity, error) {
 	entity := w.NewEntity()
 
 	if err := w.AddComponents(entity, components...); err != nil {
@@ -76,7 +76,7 @@ func (w *ECSWorld) NewEntityWithComponents(components ...Component) (Entity, err
 // AddEntity adds an existing Entity to the world.
 //
 // Useful when deserializing entities.
-func (w *ECSWorld) AddEntity(entity Entity) error {
+func (w *World) AddEntity(entity Entity) error {
 	if entity.IsNil() {
 		return ErrNilEntity
 	}
@@ -92,7 +92,7 @@ func (w *ECSWorld) AddEntity(entity Entity) error {
 // AddEntityWithComponents adds an existing Entity with the given components to the world.
 //
 // If any of the components fail to be added, the entity will be removed from the world and the error is returned.
-func (w *ECSWorld) AddEntityWithComponents(entity Entity, components ...Component) error {
+func (w *World) AddEntityWithComponents(entity Entity, components ...Component) error {
 	if err := w.AddEntity(entity); err != nil {
 		return err
 	}
@@ -110,7 +110,7 @@ func (w *ECSWorld) AddEntityWithComponents(entity Entity, components ...Componen
 // Removing an entity will make it and its components unusable.
 //
 // If a component fails to be removed, the entity will still be removed from the world.
-func (w *ECSWorld) RemoveEntity(entity Entity) (bool, error) {
+func (w *World) RemoveEntity(entity Entity) (bool, error) {
 	if entity.IsNil() {
 		return false, ErrNilEntity
 	}
@@ -132,7 +132,7 @@ func (w *ECSWorld) RemoveEntity(entity Entity) (bool, error) {
 }
 
 // FilterEntitiesByComponents returns a set of entities that have all of the specified component types.
-func (w *ECSWorld) FilterEntitiesByComponents(componentTypes ...ComponentType) hash.HashSet[Entity] {
+func (w *World) FilterEntitiesByComponents(componentTypes ...ComponentType) hash.HashSet[Entity] {
 	if len(componentTypes) == 0 {
 		return w.entities
 	}
@@ -157,7 +157,7 @@ func (w *ECSWorld) FilterEntitiesByComponents(componentTypes ...ComponentType) h
 // =================================================================
 
 // AddComponent adds a component to an entity in the world.
-func (w *ECSWorld) AddComponent(entity Entity, component Component) error {
+func (w *World) AddComponent(entity Entity, component Component) error {
 	if entity.IsNil() {
 		return ErrNilEntity
 	}
@@ -192,7 +192,7 @@ func (w *ECSWorld) AddComponent(entity Entity, component Component) error {
 }
 
 // AddComponents adds multiple components to an entity in the world.
-func (w *ECSWorld) AddComponents(entity Entity, components ...Component) error {
+func (w *World) AddComponents(entity Entity, components ...Component) error {
 	for _, c := range components {
 		if err := w.AddComponent(entity, c); err != nil {
 			return err
@@ -202,7 +202,7 @@ func (w *ECSWorld) AddComponents(entity Entity, components ...Component) error {
 }
 
 // RemoveComponent removes a component from an entity in the world.
-func (w *ECSWorld) RemoveComponent(entity Entity, ct ComponentType) error {
+func (w *World) RemoveComponent(entity Entity, ct ComponentType) error {
 	if entity.IsNil() {
 		return ErrNilEntity
 	}
@@ -242,7 +242,7 @@ func (w *ECSWorld) RemoveComponent(entity Entity, ct ComponentType) error {
 }
 
 // RemoveComponents removes multiple components from an entity in the world.
-func (w *ECSWorld) RemoveComponents(entity Entity, cts ...ComponentType) error {
+func (w *World) RemoveComponents(entity Entity, cts ...ComponentType) error {
 	for _, ct := range cts {
 		if err := w.RemoveComponent(entity, ct); err != nil {
 			return err
@@ -252,7 +252,7 @@ func (w *ECSWorld) RemoveComponents(entity Entity, cts ...ComponentType) error {
 }
 
 // GetComponent returns a component from an entity within the world.
-func (w *ECSWorld) GetComponent(entity Entity, ct ComponentType) (Component, bool, error) {
+func (w *World) GetComponent(entity Entity, ct ComponentType) (Component, bool, error) {
 	if entity.IsNil() {
 		return nil, false, ErrNilEntity
 	}
@@ -282,7 +282,7 @@ func (w *ECSWorld) GetComponent(entity Entity, ct ComponentType) (Component, boo
 }
 
 // GetComponents returns multiple components from an entity within the world.
-func (w *ECSWorld) GetComponents(entity Entity, cts ...ComponentType) (map[ComponentType]Component, error) {
+func (w *World) GetComponents(entity Entity, cts ...ComponentType) (map[ComponentType]Component, error) {
 	components := make(map[ComponentType]Component)
 
 	for _, ct := range cts {
@@ -300,7 +300,7 @@ func (w *ECSWorld) GetComponents(entity Entity, cts ...ComponentType) (map[Compo
 // System Management
 // =================================================================
 
-func (w *ECSWorld) RegisterSystems(systems map[System]int) error {
+func (w *World) RegisterSystems(systems map[System]int) error {
 	for sys, order := range systems {
 		if sys == nil {
 			return ErrNilSystem
@@ -355,7 +355,7 @@ func (w *ECSWorld) RegisterSystems(systems map[System]int) error {
 	return nil
 }
 
-func (w *ECSWorld) ProcessUpdateSystems(deltaSeconds, fixedDeltaSeconds float64, frameCount int) error {
+func (w *World) ProcessUpdateSystems(deltaSeconds, fixedDeltaSeconds float64, frameCount int) error {
 	for _, sys := range w.earlyUpdates {
 		if err := sys.Sys.EarlyUpdate(w, deltaSeconds); err != nil {
 			return err
@@ -380,7 +380,7 @@ func (w *ECSWorld) ProcessUpdateSystems(deltaSeconds, fixedDeltaSeconds float64,
 	return nil
 }
 
-func (w *ECSWorld) ProcessRenderSystems(screen *ebiten.Image) error {
+func (w *World) ProcessRenderSystems(screen *ebiten.Image) error {
 	for _, sys := range w.renderSystems {
 		if err := sys.Sys.Render(w, screen); err != nil {
 			return err

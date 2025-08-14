@@ -33,7 +33,7 @@ type System interface {
 type EarlyUpdateSystem interface {
 	System
 
-	EarlyUpdate(world *ECSWorld, deltaSeconds float64) error
+	EarlyUpdate(world *World, deltaSeconds float64) error
 }
 
 // FixedUpdateSystem is an interface for systems that need to perform fixed updates on entities. Recommended for physics and similar systems.
@@ -44,7 +44,7 @@ type EarlyUpdateSystem interface {
 type FixedUpdateSystem interface {
 	System
 
-	FixedUpdate(world *ECSWorld, fixedDeltaSeconds float64) error
+	FixedUpdate(world *World, fixedDeltaSeconds float64) error
 }
 
 // LateUpdateSystem is an interface for systems that need to perform late updates on entities.
@@ -53,14 +53,14 @@ type FixedUpdateSystem interface {
 type LateUpdateSystem interface {
 	System
 
-	LateUpdate(world *ECSWorld, deltaSeconds float64) error
+	LateUpdate(world *World, deltaSeconds float64) error
 }
 
 // RenderSystem is an interface for systems that need to render entities.
 type RenderSystem interface {
 	System
 
-	Render(world *ECSWorld, buffer *ebiten.Image) error
+	Render(world *World, buffer *ebiten.Image) error
 }
 
 // OrderedSystem is used for wrapping an instance of a system with an execution priority.

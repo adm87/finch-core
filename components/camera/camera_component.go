@@ -36,7 +36,7 @@ func NewCameraComponent() *CameraComponent {
 	}
 }
 
-func FindCameraComponent(world *ecs.ECSWorld) (*CameraComponent, error) {
+func FindCameraComponent(world *ecs.World) (*CameraComponent, error) {
 	entities := world.FilterEntitiesByComponents(CameraComponentType)
 
 	if len(entities) == 0 {

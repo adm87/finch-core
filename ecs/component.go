@@ -31,7 +31,7 @@ type Component interface {
 	Type() ComponentType
 }
 
-func GetComponent[T Component](world *ECSWorld, entity Entity, componentType ComponentType) (T, bool, error) {
+func GetComponent[T Component](world *World, entity Entity, componentType ComponentType) (T, bool, error) {
 	var zero T
 
 	component, exists, err := world.GetComponent(entity, componentType)
