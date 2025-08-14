@@ -32,5 +32,8 @@
 !math/
 !math/**/*
 
+!messaging/
+!messaging/**/*
+
 !types/
 !types/**/*
