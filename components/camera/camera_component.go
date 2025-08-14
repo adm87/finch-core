@@ -32,7 +32,7 @@ func NewCameraComponent() *CameraComponent {
 	return &CameraComponent{
 		TransformComponent: transform.NewTransformComponent(),
 		Zoom:               1.0,
-		ZoomFactor:         1.0,
+		ZoomFactor:         0.1,
 	}
 }
 
