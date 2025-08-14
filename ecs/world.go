@@ -33,7 +33,6 @@ type ECSWorld struct {
 	fixedUpdates            []OrderedSystem[FixedUpdateSystem]
 	lateUpdates             []OrderedSystem[LateUpdateSystem]
 	renderSystems           []OrderedSystem[RenderSystem]
-	renderMatrix            ebiten.GeoM
 }
 
 func NewWorld() *ECSWorld {
@@ -47,14 +46,6 @@ func NewWorld() *ECSWorld {
 		lateUpdates:             make([]OrderedSystem[LateUpdateSystem], 0),
 		renderSystems:           make([]OrderedSystem[RenderSystem], 0),
 	}
-}
-
-func (w *ECSWorld) RenderMatrix() ebiten.GeoM {
-	return w.renderMatrix
-}
-
-func (w *ECSWorld) SetRenderMatrix(matrix ebiten.GeoM) {
-	w.renderMatrix = matrix
 }
 
 // =================================================================
@@ -391,7 +382,7 @@ func (w *ECSWorld) ProcessUpdateSystems(deltaSeconds, fixedDeltaSeconds float64,
 
 func (w *ECSWorld) ProcessRenderSystems(screen *ebiten.Image) error {
 	for _, sys := range w.renderSystems {
-		if err := sys.Sys.Render(w, screen, w.renderMatrix); err != nil {
+		if err := sys.Sys.Render(w, screen); err != nil {
 			return err
 		}
 	}

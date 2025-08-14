@@ -60,7 +60,7 @@ type LateUpdateSystem interface {
 type RenderSystem interface {
 	System
 
-	Render(world *ECSWorld, buffer *ebiten.Image, view ebiten.GeoM) error
+	Render(world *ECSWorld, buffer *ebiten.Image) error
 }
 
 // OrderedSystem is used for wrapping an instance of a system with an execution priority.
