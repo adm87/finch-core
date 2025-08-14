@@ -18,9 +18,6 @@ type CameraComponent struct {
 
 	Zoom       float64
 	ZoomFactor float64
-
-	DragStartThreshold float64
-	IsDragging         bool
 }
 
 func (c *CameraComponent) Type() ecs.ComponentType {
@@ -36,8 +33,6 @@ func NewCameraComponent() *CameraComponent {
 		TransformComponent: transform.NewTransformComponent(),
 		Zoom:               1.0,
 		ZoomFactor:         1.0,
-		DragStartThreshold: 5.0,
-		IsDragging:         false,
 	}
 }
 
