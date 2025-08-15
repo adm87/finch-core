@@ -35,3 +35,26 @@ func (r Rectangle) IntersectsShape(shape Shape) bool {
 func (r Rectangle) String() string {
 	return fmt.Sprintf("Rectangle(X: %.2f, Y: %.2f, Width: %.2f, Height: %.2f)", r.X, r.Y, r.Width, r.Height)
 }
+
+// =================================================================
+// Rectangle64
+// =================================================================
+
+type Rectangle64 struct {
+	X, Y, Width, Height float64
+}
+
+// AABB returns the axis-aligned bounding box of the rectangle.
+func (r Rectangle64) AABB() Rectangle64 {
+	return r
+}
+
+// Contains checks if the rectangle contains a given point.
+func (r Rectangle64) Contains(point Point64) bool {
+	return point.X >= r.X && point.X <= r.X+r.Width && point.Y >= r.Y && point.Y <= r.Y+r.Height
+}
+
+// Intersects checks if the rectangle intersects with another rectangle.
+func (r Rectangle64) Intersects(other Rectangle64) bool {
+	return r.X < other.X+other.Width && r.X+r.Width > other.X && r.Y < other.Y+other.Height && r.Y+r.Height > other.Y
+}
