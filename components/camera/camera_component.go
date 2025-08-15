@@ -4,6 +4,7 @@ import (
 	"github.com/adm87/finch-core/components/transform"
 	"github.com/adm87/finch-core/ecs"
 	"github.com/adm87/finch-core/errors"
+	"github.com/adm87/finch-core/geometry"
 )
 
 var (
@@ -18,6 +19,9 @@ type CameraComponent struct {
 
 	Zoom       float64
 	ZoomFactor float64
+
+	ViewWidth  float64
+	ViewHeight float64
 }
 
 func (c *CameraComponent) Type() ecs.ComponentType {
@@ -26,6 +30,20 @@ func (c *CameraComponent) Type() ecs.ComponentType {
 
 func (c *CameraComponent) Dispose() {
 	c.TransformComponent = nil
+}
+
+func (c *CameraComponent) Viewport() geometry.Rectangle64 {
+	position := c.Position()
+
+	left := position.X - c.ViewWidth/2
+	top := position.Y - c.ViewHeight/2
+
+	return geometry.Rectangle64{
+		X:      left,
+		Y:      top,
+		Width:  c.ViewWidth,
+		Height: c.ViewHeight,
+	}
 }
 
 func NewCameraComponent() *CameraComponent {
