@@ -35,14 +35,17 @@ func (c *CameraComponent) Dispose() {
 func (c *CameraComponent) Viewport() geometry.Rectangle64 {
 	position := c.Position()
 
-	left := position.X - c.ViewWidth/2
-	top := position.Y - c.ViewHeight/2
+	width := c.ViewWidth * c.Zoom
+	height := c.ViewHeight * c.Zoom
+
+	left := position.X - width/2
+	top := position.Y - height/2
 
 	return geometry.Rectangle64{
 		X:      left,
 		Y:      top,
-		Width:  c.ViewWidth,
-		Height: c.ViewHeight,
+		Width:  width,
+		Height: height,
 	}
 }
 
