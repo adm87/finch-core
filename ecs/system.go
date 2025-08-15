@@ -3,8 +3,13 @@ package ecs
 import (
 	"strconv"
 
+	"github.com/adm87/finch-core/errors"
 	"github.com/adm87/finch-core/hash"
 	"github.com/hajimehoshi/ebiten/v2"
+)
+
+var (
+	ErrSystemTypeMismatch = errors.NewConflictError("system type mismatch")
 )
 
 // SystemType is a unique identifier for a system type.
@@ -22,8 +27,31 @@ func NewSystemType[T System]() SystemType {
 	return SystemType(hash.GetHashFromType[T]())
 }
 
+func GetSystem[T System](world *World, st SystemType) (T, bool) {
+	var zero T
+
+	sys, exists := world.GetSystem(st)
+
+	if !exists {
+		return zero, false
+	}
+
+	typedSys, ok := sys.(T)
+
+	if !ok {
+		return zero, false
+	}
+
+	return typedSys, true
+}
+
 // System is an interface that represents a system in the ECS framework.
 type System interface {
+	IsEnabled() bool
+
+	Enable()
+	Disable()
+
 	Type() SystemType
 }
 

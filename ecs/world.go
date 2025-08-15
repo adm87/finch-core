@@ -355,8 +355,16 @@ func (w *World) RegisterSystems(systems map[System]int) error {
 	return nil
 }
 
+func (w *World) GetSystem(st SystemType) (System, bool) {
+	sys, exists := w.systems[st]
+	return sys, exists
+}
+
 func (w *World) ProcessUpdateSystems(deltaSeconds, fixedDeltaSeconds float64, frameCount int) error {
 	for _, sys := range w.earlyUpdates {
+		if !sys.Sys.IsEnabled() {
+			continue
+		}
 		if err := sys.Sys.EarlyUpdate(w, deltaSeconds); err != nil {
 			return err
 		}
@@ -364,6 +372,9 @@ func (w *World) ProcessUpdateSystems(deltaSeconds, fixedDeltaSeconds float64, fr
 
 	for frameCount > 0 {
 		for _, sys := range w.fixedUpdates {
+			if !sys.Sys.IsEnabled() {
+				continue
+			}
 			if err := sys.Sys.FixedUpdate(w, fixedDeltaSeconds); err != nil {
 				return err
 			}
@@ -372,6 +383,9 @@ func (w *World) ProcessUpdateSystems(deltaSeconds, fixedDeltaSeconds float64, fr
 	}
 
 	for _, sys := range w.lateUpdates {
+		if !sys.Sys.IsEnabled() {
+			continue
+		}
 		if err := sys.Sys.LateUpdate(w, deltaSeconds); err != nil {
 			return err
 		}
@@ -382,6 +396,9 @@ func (w *World) ProcessUpdateSystems(deltaSeconds, fixedDeltaSeconds float64, fr
 
 func (w *World) ProcessRenderSystems(screen *ebiten.Image) error {
 	for _, sys := range w.renderSystems {
+		if !sys.Sys.IsEnabled() {
+			continue
+		}
 		if err := sys.Sys.Render(w, screen); err != nil {
 			return err
 		}
