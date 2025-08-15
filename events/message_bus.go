@@ -1,4 +1,4 @@
-package messaging
+package events
 
 import (
 	"github.com/adm87/finch-core/errors"

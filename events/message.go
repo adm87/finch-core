@@ -1,4 +1,4 @@
-package messaging
+package events
 
 type Message interface {
 }

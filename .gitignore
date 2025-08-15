@@ -17,6 +17,9 @@
 !errors/
 !errors/**/*
 
+!events/
+!events/**/*
+
 !fsys/
 !fsys/**/*
 
@@ -31,9 +34,6 @@
 
 !math/
 !math/**/*
-
-!messaging/
-!messaging/**/*
 
 !types/
 !types/**/*
