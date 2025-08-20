@@ -3,13 +3,13 @@ package ecs
 import (
 	"strconv"
 
-	"github.com/adm87/finch-core/hash"
+	"github.com/adm87/finch-core/utils"
 )
 
 // ComponentType is a unique identifier for a component type.
 //
 // Used to identify components in the ECS framework.
-type ComponentType hash.Hash
+type ComponentType uint64
 
 func (t ComponentType) IsNil() bool {
 	return t == 0
@@ -20,7 +20,7 @@ func (t ComponentType) String() string {
 }
 
 func NewComponentType[T Component]() ComponentType {
-	return ComponentType(hash.GetHashFromType[T]())
+	return ComponentType(utils.GetHashFromType[T]())
 }
 
 type Component interface {

@@ -40,3 +40,6 @@
 
 !types/
 !types/**/*
+
+!utils/
+!utils/**/*

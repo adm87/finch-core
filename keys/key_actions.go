@@ -2,7 +2,7 @@ package keys
 
 import (
 	"github.com/adm87/finch-core/events"
-	"github.com/adm87/finch-core/hash"
+	"github.com/adm87/finch-core/types"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
@@ -19,7 +19,7 @@ const (
 	KeyPhaseRelease
 )
 
-var keyActions = make(map[ebiten.Key]map[KeyPhase]hash.HashSet[events.Command])
+var keyActions = make(map[ebiten.Key]map[KeyPhase]types.HashSet[events.Command])
 
 func RegisterAction(key ebiten.Key, phase KeyPhase, command events.Command) error {
 	if _, exists := keyActions[key]; !exists {
@@ -82,14 +82,14 @@ func Poll() error {
 }
 
 func create_key_action(key ebiten.Key) {
-	keyActions[key] = map[KeyPhase]hash.HashSet[events.Command]{
-		KeyPhaseBegin:   make(hash.HashSet[events.Command]),
-		KeyPhasePress:   make(hash.HashSet[events.Command]),
-		KeyPhaseRelease: make(hash.HashSet[events.Command]),
+	keyActions[key] = map[KeyPhase]types.HashSet[events.Command]{
+		KeyPhaseBegin:   make(types.HashSet[events.Command]),
+		KeyPhasePress:   make(types.HashSet[events.Command]),
+		KeyPhaseRelease: make(types.HashSet[events.Command]),
 	}
 }
 
-func execute_phase_commands(commands hash.HashSet[events.Command]) error {
+func execute_phase_commands(commands types.HashSet[events.Command]) error {
 	for command := range commands {
 		if err := command.Execute(); err != nil {
 			return err

@@ -5,11 +5,11 @@ type Optional[T any] struct {
 	valid bool
 }
 
-func NewOption[T any](value T) Optional[T] {
+func NewOptional[T any](value T) Optional[T] {
 	return Optional[T]{value: value, valid: true}
 }
 
-func NewEmptyOption[T any]() Optional[T] {
+func NewEmptyOptional[T any]() Optional[T] {
 	return Optional[T]{valid: false}
 }
 

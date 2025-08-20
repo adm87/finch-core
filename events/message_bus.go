@@ -2,7 +2,7 @@ package events
 
 import (
 	"github.com/adm87/finch-core/errors"
-	"github.com/adm87/finch-core/hash"
+	"github.com/adm87/finch-core/types"
 )
 
 var (
@@ -14,12 +14,12 @@ type MessageHandler[T Message] interface {
 }
 
 type MessageBus[T Message] struct {
-	handlers hash.HashSet[MessageHandler[T]]
+	handlers types.HashSet[MessageHandler[T]]
 }
 
 func NewMessageBus[T Message]() *MessageBus[T] {
 	return &MessageBus[T]{
-		handlers: make(hash.HashSet[MessageHandler[T]]),
+		handlers: make(types.HashSet[MessageHandler[T]]),
 	}
 }
 

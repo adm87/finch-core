@@ -1,21 +1,14 @@
-package hash
+package utils
 
 import (
 	"hash/fnv"
 	"reflect"
-	"strconv"
 )
-
-type Hash uint64
-
-func (h Hash) String() string {
-	return strconv.FormatUint(uint64(h), 10)
-}
 
 // GetHashFromType computes a hash from the type of T.
 //
 // Uses the type's package path and name to ensure uniqueness.
-func GetHashFromType[T any]() Hash {
+func GetHashFromType[T any]() uint64 {
 	t := reflect.TypeOf((*T)(nil)).Elem()
 
 	var typeName string
@@ -28,5 +21,5 @@ func GetHashFromType[T any]() Hash {
 	h := fnv.New64a()
 	h.Write([]byte(typeName))
 
-	return Hash(h.Sum64())
+	return h.Sum64()
 }

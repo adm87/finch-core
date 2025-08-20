@@ -4,7 +4,7 @@ import (
 	"strconv"
 
 	"github.com/adm87/finch-core/errors"
-	"github.com/adm87/finch-core/hash"
+	"github.com/adm87/finch-core/utils"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -13,7 +13,7 @@ var (
 )
 
 // SystemType is a unique identifier for a system type.
-type SystemType hash.Hash
+type SystemType uint64
 
 func (t SystemType) IsNil() bool {
 	return t == 0
@@ -24,7 +24,7 @@ func (t SystemType) String() string {
 }
 
 func NewSystemType[T System]() SystemType {
-	return SystemType(hash.GetHashFromType[T]())
+	return SystemType(utils.GetHashFromType[T]())
 }
 
 func GetSystem[T System](world *World, st SystemType) (T, bool) {

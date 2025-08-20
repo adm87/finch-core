@@ -4,8 +4,8 @@ import (
 	"slices"
 
 	"github.com/adm87/finch-core/errors"
-	"github.com/adm87/finch-core/hash"
 	"github.com/adm87/finch-core/linq"
+	"github.com/adm87/finch-core/types"
 	"github.com/google/uuid"
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -25,8 +25,8 @@ var (
 
 // World is set of registered systems, entities, and components
 type World struct {
-	entities                hash.HashSet[Entity]
-	entitiesByComponentType map[ComponentType]hash.HashSet[Entity]
+	entities                types.HashSet[Entity]
+	entitiesByComponentType map[ComponentType]types.HashSet[Entity]
 	componentsByEntity      map[Entity]map[ComponentType]Component
 	systems                 map[SystemType]System
 	earlyUpdates            []OrderedSystem[EarlyUpdateSystem]
@@ -37,8 +37,8 @@ type World struct {
 
 func NewWorld() *World {
 	return &World{
-		entities:                make(hash.HashSet[Entity]),
-		entitiesByComponentType: make(map[ComponentType]hash.HashSet[Entity]),
+		entities:                make(types.HashSet[Entity]),
+		entitiesByComponentType: make(map[ComponentType]types.HashSet[Entity]),
 		componentsByEntity:      make(map[Entity]map[ComponentType]Component),
 		systems:                 make(map[SystemType]System),
 		earlyUpdates:            make([]OrderedSystem[EarlyUpdateSystem], 0),
@@ -132,24 +132,24 @@ func (w *World) RemoveEntity(entity Entity) (bool, error) {
 }
 
 // FilterEntitiesByComponents returns a set of entities that have all of the specified component types.
-func (w *World) FilterEntitiesByComponents(componentTypes ...ComponentType) hash.HashSet[Entity] {
+func (w *World) FilterEntitiesByComponents(componentTypes ...ComponentType) types.HashSet[Entity] {
 	if len(componentTypes) == 0 {
 		return w.entities
 	}
 
-	sets := make([]hash.HashSet[Entity], 0, len(componentTypes))
+	sets := make([]types.HashSet[Entity], 0, len(componentTypes))
 	for _, ct := range componentTypes {
 		if ct.IsNil() {
-			return hash.HashSet[Entity]{}
+			return types.HashSet[Entity]{}
 		}
 		set, ok := w.entitiesByComponentType[ct]
 		if !ok {
-			return hash.HashSet[Entity]{}
+			return types.HashSet[Entity]{}
 		}
 		sets = append(sets, set)
 	}
 
-	return hash.IntersectHashSets(sets...)
+	return types.IntersectHashSets(sets...)
 }
 
 // =================================================================
@@ -173,7 +173,7 @@ func (w *World) AddComponent(entity Entity, component Component) error {
 	ct := component.Type()
 
 	if _, exists := w.entitiesByComponentType[ct]; !exists {
-		w.entitiesByComponentType[ct] = make(hash.HashSet[Entity])
+		w.entitiesByComponentType[ct] = make(types.HashSet[Entity])
 	}
 
 	if _, exists := w.entitiesByComponentType[ct][entity]; exists {
