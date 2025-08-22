@@ -29,3 +29,13 @@ func SelectValues[K comparable, V any](source map[K]V, selector func(K, V) bool)
 	}
 	return result
 }
+
+func SelectKVP[K comparable, V any](source map[K]V, selector func(K, V) bool) map[K]V {
+	result := make(map[K]V)
+	for key, value := range source {
+		if selector(key, value) {
+			result[key] = value
+		}
+	}
+	return result
+}
