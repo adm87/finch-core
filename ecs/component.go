@@ -24,9 +24,6 @@ func NewComponentType[T Component]() ComponentType {
 }
 
 type Component interface {
-	// Dispose can be used to dereference any resources held by the component.
-	Dispose()
-
 	// Type returns the unique identifier for the component type.
 	Type() ComponentType
 }

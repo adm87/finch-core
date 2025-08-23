@@ -230,8 +230,6 @@ func (w *World) RemoveComponent(entity Entity, ct ComponentType) error {
 
 	// This should be safe, we don't map the component in the Add methods unless it's a valid addition.
 	if component := w.componentsByEntity[entity][ct]; component != nil {
-		component.Dispose()
-
 		delete(w.componentsByEntity[entity], ct)
 		if len(w.componentsByEntity[entity]) == 0 {
 			delete(w.componentsByEntity, entity)

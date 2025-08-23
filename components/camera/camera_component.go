@@ -28,10 +28,6 @@ func (c *CameraComponent) Type() ecs.ComponentType {
 	return CameraComponentType
 }
 
-func (c *CameraComponent) Dispose() {
-	c.TransformComponent = nil
-}
-
 func (c *CameraComponent) Viewport() geometry.Rectangle64 {
 	position := c.Position()
 

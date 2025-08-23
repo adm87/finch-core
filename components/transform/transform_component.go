@@ -46,10 +46,6 @@ func NewTransformComponentWith(position geometry.Point64, scale geometry.Point64
 	}
 }
 
-func (t *TransformComponent) Dispose() {
-
-}
-
 func (t *TransformComponent) Type() ecs.ComponentType {
 	return TransformComponentType
 }

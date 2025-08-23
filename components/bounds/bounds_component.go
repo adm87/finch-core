@@ -23,10 +23,6 @@ func (b *BoundsComponent) Type() ecs.ComponentType {
 	return BoundsComponentType
 }
 
-func (b *BoundsComponent) Dispose() {
-
-}
-
 func (b *BoundsComponent) Left() float64 {
 	return -b.Size.X * b.Anchor.X
 }
