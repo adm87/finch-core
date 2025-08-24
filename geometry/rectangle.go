@@ -44,9 +44,14 @@ type Rectangle64 struct {
 	X, Y, Width, Height float64
 }
 
-// AABB returns the axis-aligned bounding box of the rectangle.
-func (r Rectangle64) AABB() Rectangle64 {
-	return r
+// Translate returns a new rectangle translated by the given offsets.
+func (r Rectangle64) Translate(dx, dy float64) Rectangle64 {
+	return Rectangle64{
+		X:      r.X + dx,
+		Y:      r.Y + dy,
+		Width:  r.Width,
+		Height: r.Height,
+	}
 }
 
 // Contains checks if the rectangle contains a given point.
