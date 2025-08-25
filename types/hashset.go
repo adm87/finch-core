@@ -2,12 +2,12 @@ package types
 
 import "slices"
 
-var SetEntry struct{} = struct{}{}
+var setEntry struct{} = struct{}{}
 
 type HashSet[T comparable] map[T]struct{}
 
 func (s HashSet[T]) Add(item T) {
-	s[item] = SetEntry
+	s[item] = setEntry
 }
 
 func (s HashSet[T]) Contains(item T) bool {
