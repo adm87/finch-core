@@ -3,12 +3,17 @@ package events
 type CommandStack struct {
 	stack      []UndoRedoCommand
 	stackIndex int
+	stackLimit int
 }
 
-func NewCommandStack() *CommandStack {
+func NewCommandStack(limit uint) *CommandStack {
+	if limit == 0 {
+		panic("command stack limit must be greater than zero")
+	}
 	return &CommandStack{
 		stack:      make([]UndoRedoCommand, 0),
 		stackIndex: -1,
+		stackLimit: int(limit),
 	}
 }
 
@@ -17,11 +22,7 @@ func (cs *CommandStack) ExecuteCommand(cmd Command) error {
 		return err
 	}
 	if undoRedoCmd, ok := cmd.(UndoRedoCommand); ok {
-		if cs.stackIndex < len(cs.stack)-1 {
-			cs.stack = cs.stack[:cs.stackIndex+1]
-		}
-		cs.stack = append(cs.stack, undoRedoCmd)
-		cs.stackIndex++
+		cs.push_command(undoRedoCmd)
 	}
 	return nil
 }
@@ -48,4 +49,21 @@ func (cs *CommandStack) Redo() error {
 	}
 	cs.stackIndex++
 	return nil
+}
+
+func (cs *CommandStack) Clear() {
+	cs.stack = make([]UndoRedoCommand, 0)
+	cs.stackIndex = -1
+}
+
+func (cs *CommandStack) push_command(cmd UndoRedoCommand) {
+	cs.stack = cs.stack[:cs.stackIndex+1]
+
+	if cs.stackLimit > 0 && len(cs.stack) >= cs.stackLimit {
+		cs.stack = cs.stack[1:]
+		cs.stackIndex--
+	}
+
+	cs.stack = append(cs.stack, cmd)
+	cs.stackIndex = len(cs.stack) - 1
 }
