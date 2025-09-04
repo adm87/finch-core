@@ -10,6 +10,12 @@ func (s HashSet[T]) Add(item T) {
 	s[item] = setEntry
 }
 
+func (s HashSet[T]) AddUnique(item T) {
+	if !s.Contains(item) {
+		s.Add(item)
+	}
+}
+
 func (s HashSet[T]) Contains(item T) bool {
 	_, exists := s[item]
 	return exists

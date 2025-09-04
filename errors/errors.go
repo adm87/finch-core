@@ -193,3 +193,22 @@ func IsSecurityError(err error) bool {
 func NewSecurityError(msg string) SecurityError {
 	return SecurityError("security: " + msg)
 }
+
+// =================================================================
+// Unmarshal Error
+// =================================================================
+
+type UnmarshalError string
+
+func (e UnmarshalError) Error() string {
+	return string(e)
+}
+
+func IsUnmarshalError(err error) bool {
+	_, ok := err.(UnmarshalError)
+	return ok
+}
+
+func NewUnmarshalError(msg string) UnmarshalError {
+	return UnmarshalError("unmarshal: " + msg)
+}
