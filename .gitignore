@@ -5,6 +5,8 @@
 !go.mod
 !go.sum
 
+!LICENSE
+
 !finch/
 !finc/**/*
 
