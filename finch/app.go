@@ -59,10 +59,14 @@ type App struct {
 	window *Window
 }
 
-func NewApp(ctx context.Context, logger *slog.Logger) *App {
+func NewApp() *App {
+	return NewAppWithContext(context.Background())
+}
+
+func NewAppWithContext(ctx context.Context) *App {
 	s := NewScreen(800, 600, 1.0, false)
 	t := NewTime(60.0)
-	return &App{ctx: NewContext(ctx, logger, s, t)}
+	return &App{ctx: NewContext(ctx, slog.Default(), s, t)}
 }
 
 func (a *App) WithDraw(drawFunc DrawFunc) *App {
@@ -105,6 +109,11 @@ func (a *App) WithWindow(window *Window) *App {
 	a.ctx.Screen().set_target_size(window.Width, window.Height)
 	a.ctx.Screen().set_render_scale(window.RenderScale)
 	a.ctx.Screen().set_fullscreen(window.Fullscreen)
+	return a
+}
+
+func (a *App) WithLogger(logger *slog.Logger) *App {
+	a.ctx = a.ctx.SetLogger(logger)
 	return a
 }
 
@@ -159,16 +168,11 @@ func (a *App) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight
 	}
 
 	if currentWidth != screenWidth || currentHeight != screenHeight {
-		oldWidth := currentWidth
-		oldHeight := currentHeight
 		currentWidth = screenWidth
 		currentHeight = screenHeight
-
 		a.ctx.Logger().Info("Resized screen",
-			slog.Int("oldWidth", oldWidth),
-			slog.Int("oldHeight", oldHeight),
-			slog.Int("newWidth", currentWidth),
-			slog.Int("newHeight", currentHeight),
+			slog.Int("width", currentWidth),
+			slog.Int("height", currentHeight),
 		)
 	}
 

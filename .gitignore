@@ -13,6 +13,9 @@
 !fsys/
 !fsys/**/*
 
+!linq/
+!linq/**/*
+
 !types/
 !types/**/*
 

@@ -9,9 +9,10 @@ type ContextKey string
 
 type Context interface {
 	Context() context.Context
-	Logger() *slog.Logger
 	Screen() *Screen
 	Time() *Time
+	Logger() *slog.Logger
+	SetLogger(logger *slog.Logger) Context
 	Get(key ContextKey) any
 	Set(key ContextKey, value any) Context
 }
@@ -36,16 +37,21 @@ func (c *finchCtx) Context() context.Context {
 	return c.ctx
 }
 
-func (c *finchCtx) Logger() *slog.Logger {
-	return c.logger
-}
-
 func (c *finchCtx) Screen() *Screen {
 	return c.screen
 }
 
 func (c *finchCtx) Time() *Time {
 	return c.time
+}
+
+func (c *finchCtx) Logger() *slog.Logger {
+	return c.logger
+}
+
+func (c *finchCtx) SetLogger(logger *slog.Logger) Context {
+	c.logger = logger
+	return c
 }
 
 func (c *finchCtx) Get(key ContextKey) any {
