@@ -6,10 +6,6 @@ var entry = struct{}{}
 
 type HashSet[T comparable] map[T]struct{}
 
-func NewHashSet[T comparable]() HashSet[T] {
-	return make(HashSet[T])
-}
-
 func NewHashSetFromSlice[T comparable](items []T) HashSet[T] {
 	hs := make(HashSet[T], len(items))
 	for _, item := range items {
@@ -54,13 +50,13 @@ func (hs HashSet[T]) IsEmpty() bool {
 }
 func Union[T comparable](sets ...HashSet[T]) HashSet[T] {
 	if len(sets) == 0 {
-		return NewHashSet[T]()
+		return make(HashSet[T])
 	}
 	if len(sets) == 1 {
 		return sets[0]
 	}
 
-	result := NewHashSet[T]()
+	result := make(HashSet[T])
 	for _, set := range sets {
 		for k := range set {
 			result.Add(k)
@@ -71,7 +67,7 @@ func Union[T comparable](sets ...HashSet[T]) HashSet[T] {
 
 func Intersection[T comparable](sets ...HashSet[T]) HashSet[T] {
 	if len(sets) == 0 {
-		return NewHashSet[T]()
+		return make(HashSet[T])
 	}
 	if len(sets) == 1 {
 		return sets[0]
@@ -81,7 +77,7 @@ func Intersection[T comparable](sets ...HashSet[T]) HashSet[T] {
 		return len(a) - len(b)
 	})
 
-	result := NewHashSet[T]()
+	result := make(HashSet[T])
 	for k := range sets[0] {
 		inAll := true
 		for _, set := range sets[1:] {
