@@ -7,27 +7,6 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-var (
-	firstUpdate   = true
-	shouldExit    = false
-	currentWidth  = 0
-	currentHeight = 0
-)
-
-func Run(a *App) error {
-	if window := a.window; window != nil {
-		ebiten.SetWindowTitle(window.Title)
-		ebiten.SetWindowSize(window.Width, window.Height)
-		ebiten.SetWindowResizingMode(window.ResizingMode)
-		ebiten.SetFullscreen(window.Fullscreen)
-	}
-	return ebiten.RunGame(a)
-}
-
-func Exit() {
-	shouldExit = true
-}
-
 type (
 	DrawFunc     func(ctx Context, screen *ebiten.Image)
 	LayoutFunc   func(ctx Context, outsideWidth, outsideHeight int) (screenWidth, screenHeight int)
@@ -57,6 +36,27 @@ type App struct {
 	ShutdownFn    ShutdownFunc
 
 	window *Window
+}
+
+var (
+	firstUpdate   = true
+	shouldExit    = false
+	currentWidth  = 0
+	currentHeight = 0
+)
+
+func Run(a *App) error {
+	if window := a.window; window != nil {
+		ebiten.SetWindowTitle(window.Title)
+		ebiten.SetWindowSize(window.Width, window.Height)
+		ebiten.SetWindowResizingMode(window.ResizingMode)
+		ebiten.SetFullscreen(window.Fullscreen)
+	}
+	return ebiten.RunGame(a)
+}
+
+func Exit() {
+	shouldExit = true
 }
 
 func NewApp() *App {
@@ -176,7 +176,7 @@ func (a *App) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight
 		)
 	}
 
-	return screenWidth, screenHeight
+	return currentWidth, currentHeight
 }
 
 func (a *App) Context() Context {
