@@ -13,6 +13,9 @@
 !fsys/
 !fsys/**/*
 
+!geom/
+!geom/**/*
+
 !linq/
 !linq/**/*
 
