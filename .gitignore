@@ -19,6 +19,9 @@
 !linq/
 !linq/**/*
 
+!tmpl/
+!tmpl/**/*
+
 !types/
 !types/**/*
 
