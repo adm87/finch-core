@@ -144,6 +144,7 @@ func Render(name string, content []byte, data any) []byte {
 			}
 			return string(data)
 		},
+		"trim": strings.Trim,
 	})
 	tmpl = template.Must(tmpl.Parse(string(content)))
 	var buf bytes.Buffer
