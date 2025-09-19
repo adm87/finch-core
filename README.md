@@ -1,7 +1,7 @@
 # Finch Core
-The Finch Core module is the base for all other Finch modules. It provides an wrapper to and launch an Ebitengine application, along with other utilities used across the Finch ecosystem.
+The Finch Core module is the base for all other Finch modules. It provides a wrapper to configure and launch an Ebitengine application, along with other utilities used across the Finch ecosystem.
 
-This core module is agnostic of all other Finch modules and should be considered as the minimum entry point into a Finch application.
+This core module is agnostic of all other Finch modules and should be considered the minimum entry point into a Finch application.
 
 ## Usage
 ```go
