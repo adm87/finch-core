@@ -1,39 +1,35 @@
 package geom
 
 type Rect64 struct {
-	x, y, w, h float64
+	X, Y, Width, Height float64
 }
 
 func NewRect64(x, y, w, h float64) Rect64 {
-	return Rect64{x, y, w, h}
+	return Rect64{X: x, Y: y, Width: w, Height: h}
 }
 
 func (r *Rect64) SetXY(x, y float64) {
-	r.x = x
-	r.y = y
+	r.X = x
+	r.Y = y
 }
 
 func (r *Rect64) SetSize(w, h float64) {
-	r.w = w
-	r.h = h
+	r.Width = w
+	r.Height = h
 }
 
 func (r Rect64) Min() (float64, float64) {
-	return r.x, r.y
+	return r.X, r.Y
 }
 
 func (r Rect64) Max() (float64, float64) {
-	return r.x + r.w, r.y + r.h
-}
-
-func (r Rect64) Width() float64 {
-	return r.w
-}
-
-func (r Rect64) Height() float64 {
-	return r.h
+	return r.X + r.Width, r.Y + r.Height
 }
 
 func (r Rect64) ContainsXY(x, y float64) bool {
-	return x >= r.x && x < r.x+r.w && y >= r.y && y < r.y+r.h
+	return x >= r.X && x < r.X+r.Width && y >= r.Y && y < r.Y+r.Height
+}
+
+func (r Rect64) Intersects(o *Rect64) bool {
+	return r.X < o.X+o.Width && r.X+r.Width > o.X && r.Y < o.Y+o.Height && r.Y+r.Height > o.Y
 }

@@ -7,3 +7,28 @@ const (
 	RadToDeg = 57.29577951308232    // 180/π
 	DegToRad = 0.017453292519943295 // π/180
 )
+
+type number interface {
+	int | int8 | int16 | int32 | int64 | float32 | float64
+}
+
+func Abs[T number](v T) T {
+	if v < 0 {
+		return -v
+	}
+	return v
+}
+
+func Max[T number](a, b T) T {
+	if a > b {
+		return a
+	}
+	return b
+}
+
+func Min[T number](a, b T) T {
+	if a < b {
+		return a
+	}
+	return b
+}
