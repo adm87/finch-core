@@ -19,6 +19,16 @@ func Abs[T number](v T) T {
 	return v
 }
 
+func Clamp[T number](v, min, max T) T {
+	if v < min {
+		return min
+	}
+	if v > max {
+		return max
+	}
+	return v
+}
+
 func Max[T number](a, b T) T {
 	if a > b {
 		return a
