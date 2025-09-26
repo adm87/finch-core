@@ -17,6 +17,9 @@
 !geom/
 !geom/**/*
 
+!images/
+!images/**/*
+
 !linq/
 !linq/**/*
 
