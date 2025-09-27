@@ -29,7 +29,7 @@ func MustGet(file finch.AssetFile) *ebiten.Image {
 	return finch.MustGetAsset[*ebiten.Image](file)
 }
 
-func allocator(data []byte) (any, error) {
+func allocator(file finch.AssetFile, data []byte) (any, error) {
 	img, _, err := ebitenutil.NewImageFromReader(bytes.NewReader(data))
 	if err != nil {
 		return nil, err
@@ -37,8 +37,8 @@ func allocator(data []byte) (any, error) {
 	return img, nil
 }
 
-func deallocator(asset any) error {
-	img, ok := asset.(*ebiten.Image)
+func deallocator(file finch.AssetFile, data any) error {
+	img, ok := data.(*ebiten.Image)
 	if !ok {
 		return errors.New("asset is not an *ebiten.Image")
 	}

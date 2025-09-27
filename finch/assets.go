@@ -45,10 +45,10 @@ type AssetManager struct {
 // ======================================================
 
 // AssetAllocator is a function that takes raw asset data and converts it into a usable form.
-type AssetAllocator func(data []byte) (any, error)
+type AssetAllocator func(file AssetFile, filedata []byte) (any, error)
 
 // AssetDeallocator is a function that takes a loaded asset and frees its resources.
-type AssetDeallocator func(data any) error
+type AssetDeallocator func(file AssetFile, data any) error
 
 // ======================================================
 // Asset Type
@@ -204,14 +204,14 @@ func GetAsset[T any](file AssetFile) (T, error) {
 	data, ok := assetCache[file]
 
 	if !ok {
-		return *new(T), fmt.Errorf("%s: %w", ErrAssetNotLoaded, file)
+		return *new(T), fmt.Errorf("%s: %s", ErrAssetNotLoaded, file)
 	}
 
 	if typed, ok := data.(T); ok {
 		return typed, nil
 	}
 
-	return *new(T), fmt.Errorf("%s: %w", ErrAssetTypeMismatch, file)
+	return *new(T), fmt.Errorf("%s: %s", ErrAssetTypeMismatch, file)
 }
 
 func MustGetAsset[T any](file AssetFile) T {
@@ -269,7 +269,7 @@ func UnloadAssets(files ...AssetFile) error {
 		}
 
 		if manager.Deallocator != nil {
-			if err := manager.Deallocator(asset); err != nil {
+			if err := manager.Deallocator(file, asset); err != nil {
 				return fmt.Errorf("failed to deallocate asset %s: %w", file, err)
 			}
 		}
@@ -416,7 +416,7 @@ func load_asset_file(file AssetFile) error {
 		return fmt.Errorf("%s: %s", ErrAssetManagerNil, file.Type())
 	}
 
-	asset, err := manager.Allocator(data)
+	asset, err := manager.Allocator(file, data)
 	if err != nil {
 		return fmt.Errorf("failed to import asset %s: %w", file, err)
 	}
