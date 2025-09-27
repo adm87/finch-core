@@ -162,6 +162,11 @@ var (
 	assetsMu         = sync.RWMutex{}
 )
 
+func HasAssetTypeSupport(t AssetType) bool {
+	_, exists := assetManagers[t]
+	return exists
+}
+
 func RegisterAssetManager(manager *AssetManager) error {
 	if manager == nil {
 		return ErrAssetManagerNil

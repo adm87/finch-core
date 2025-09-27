@@ -11,7 +11,7 @@ import (
 )
 
 // Render processes a text template with the given name, content, and data context,
-func Render(name string, content []byte, data any) []byte {
+func Render(name string, content string, data any) []byte {
 	tmpl := template.New(name)
 	tmpl.Funcs(template.FuncMap{
 		"array":  func(v ...any) []any { return v },
@@ -155,8 +155,8 @@ func Render(name string, content []byte, data any) []byte {
 }
 
 // RenderH is like Render but also takes helper templates to be included.
-func RenderH(name string, content []byte, helpers []byte, data any) []byte {
-	return Render(name, append(helpers, content...), data)
+func RenderH(name string, content string, helpers string, data any) []byte {
+	return Render(name, content, data)
 }
 
 func include(tmpl *template.Template) func(name string, data any) (string, error) {
