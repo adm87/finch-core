@@ -17,6 +17,9 @@
 !geom/
 !geom/**/*
 
+!hashset/
+!hashset/**/*
+
 !images/
 !images/**/*
 
@@ -25,9 +28,6 @@
 
 !tmpl/
 !tmpl/**/*
-
-!types/
-!types/**/*
 
 !utils/
 !utils/**/*

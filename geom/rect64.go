@@ -30,6 +30,6 @@ func (r Rect64) ContainsXY(x, y float64) bool {
 	return x >= r.X && x < r.X+r.Width && y >= r.Y && y < r.Y+r.Height
 }
 
-func (r Rect64) Intersects(o *Rect64) bool {
+func (r Rect64) Intersects(o Rect64) bool {
 	return r.X < o.X+o.Width && r.X+r.Width > o.X && r.Y < o.Y+o.Height && r.Y+r.Height > o.Y
 }

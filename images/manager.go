@@ -11,9 +11,22 @@ import (
 
 func RegisterAssetManager() {
 	finch.RegisterAssetManager(&finch.AssetManager{
-		Types:       []finch.AssetType{"png", "jpg", "jpeg", "bmp"},
-		Allocator:   allocator,
-		Deallocator: deallocator,
+		AssetTypes: []finch.AssetType{"png", "jpg", "jpeg", "bmp"},
+		ProcessAssetFile: func(file finch.AssetFile, data []byte) (any, error) {
+			img, _, err := ebitenutil.NewImageFromReader(bytes.NewReader(data))
+			if err != nil {
+				return nil, err
+			}
+			return img, nil
+		},
+		CleanupAssetFile: func(file finch.AssetFile, data any) error {
+			img, ok := data.(*ebiten.Image)
+			if !ok {
+				return errors.New("asset is not an *ebiten.Image")
+			}
+			img.Deallocate()
+			return nil
+		},
 	})
 }
 
@@ -27,21 +40,4 @@ func Get(file finch.AssetFile) (*ebiten.Image, error) {
 
 func MustGet(file finch.AssetFile) *ebiten.Image {
 	return finch.MustGetAsset[*ebiten.Image](file)
-}
-
-func allocator(file finch.AssetFile, data []byte) (any, error) {
-	img, _, err := ebitenutil.NewImageFromReader(bytes.NewReader(data))
-	if err != nil {
-		return nil, err
-	}
-	return img, nil
-}
-
-func deallocator(file finch.AssetFile, data any) error {
-	img, ok := data.(*ebiten.Image)
-	if !ok {
-		return errors.New("asset is not an *ebiten.Image")
-	}
-	img.Deallocate()
-	return nil
 }

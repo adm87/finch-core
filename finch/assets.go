@@ -10,8 +10,8 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/adm87/finch-core/hashset"
 	"github.com/adm87/finch-core/linq"
-	"github.com/adm87/finch-core/types"
 )
 
 var (
@@ -35,9 +35,9 @@ var (
 
 // AssetManager managers allocation and deallocation of a specific asset types.
 type AssetManager struct {
-	Allocator   AssetAllocator
-	Deallocator AssetDeallocator
-	Types       []AssetType
+	ProcessAssetFile AssetAllocator
+	CleanupAssetFile AssetDeallocator
+	AssetTypes       []AssetType
 }
 
 // ======================================================
@@ -158,7 +158,7 @@ var (
 	assetCache       = make(map[AssetFile]any)
 	assetManagers    = make(map[AssetType]*AssetManager)
 	assetFilesystems = make(map[AssetRoot]fs.FS)
-	assetsLoading    = make(types.HashSet[AssetFile])
+	assetsLoading    = hashset.New[AssetFile]()
 	assetsMu         = sync.RWMutex{}
 )
 
@@ -172,7 +172,7 @@ func RegisterAssetManager(manager *AssetManager) error {
 		return ErrAssetManagerNil
 	}
 
-	for _, t := range manager.Types {
+	for _, t := range manager.AssetTypes {
 		if err := t.IsValid(); err != nil {
 			return fmt.Errorf("%s: %w", ErrAssetInvalidType, err)
 		}
@@ -234,7 +234,7 @@ func LoadAssets(files ...AssetFile) error {
 		return nil
 	}
 
-	requests := make(types.HashSet[AssetFile])
+	requests := hashset.New[AssetFile]()
 	errs := make([]error, 0)
 
 	if err := build_asset_requests(requests, files); err != nil {
@@ -273,8 +273,8 @@ func UnloadAssets(files ...AssetFile) error {
 			return fmt.Errorf("%s: %s", ErrAssetManagerNotFound, file.Type())
 		}
 
-		if manager.Deallocator != nil {
-			if err := manager.Deallocator(file, asset); err != nil {
+		if manager.CleanupAssetFile != nil {
+			if err := manager.CleanupAssetFile(file, asset); err != nil {
 				return fmt.Errorf("failed to deallocate asset %s: %w", file, err)
 			}
 		}
@@ -291,7 +291,7 @@ func MustUnloadAssets(files ...AssetFile) {
 	}
 }
 
-func build_asset_requests(requests types.HashSet[AssetFile], files []AssetFile) error {
+func build_asset_requests(requests hashset.Set[AssetFile], files []AssetFile) error {
 	errs := make([]error, 0)
 
 	for _, file := range files {
@@ -417,11 +417,11 @@ func load_asset_file(file AssetFile) error {
 		return fmt.Errorf("%s: %s", ErrAssetManagerNotFound, file.Type())
 	}
 
-	if manager.Allocator == nil {
+	if manager.ProcessAssetFile == nil {
 		return fmt.Errorf("%s: %s", ErrAssetManagerNil, file.Type())
 	}
 
-	asset, err := manager.Allocator(file, data)
+	asset, err := manager.ProcessAssetFile(file, data)
 	if err != nil {
 		return fmt.Errorf("failed to import asset %s: %w", file, err)
 	}

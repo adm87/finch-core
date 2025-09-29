@@ -1,6 +1,6 @@
 package linq
 
-import "github.com/adm87/finch-core/types"
+import "github.com/adm87/finch-core/hashset"
 
 // Distinct returns a new slice containing only unique elements from the input slice.
 func Distinct[T comparable](items []T) []T {
@@ -8,14 +8,14 @@ func Distinct[T comparable](items []T) []T {
 		return nil
 	}
 
-	seen := types.HashSet[T]{}
+	seen := hashset.New[T]()
 	var result []T
 
 	for _, item := range items {
 		if !seen.Contains(item) {
-			seen.Add(item)
 			result = append(result, item)
 		}
+		seen.AddDistinct(item)
 	}
 
 	return result
@@ -27,15 +27,15 @@ func DistinctFunc[T any, K comparable](items []T, keyFunc func(T) K) []T {
 		return nil
 	}
 
-	seen := types.HashSet[K]{}
+	seen := hashset.New[K]()
 	var result []T
 
 	for _, item := range items {
 		key := keyFunc(item)
 		if !seen.Contains(key) {
-			seen.Add(key)
 			result = append(result, item)
 		}
+		seen.AddDistinct(key)
 	}
 
 	return result
