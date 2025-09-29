@@ -29,6 +29,10 @@ func Clamp[T number](v, min, max T) T {
 	return v
 }
 
+func Lerp[T number](a, b, t T) T {
+	return a + (b-a)*t
+}
+
 func Max[T number](a, b T) T {
 	if a > b {
 		return a

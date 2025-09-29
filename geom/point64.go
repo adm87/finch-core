@@ -1,5 +1,7 @@
 package geom
 
+import "math"
+
 type Point64 struct {
 	X float64
 	Y float64
@@ -25,18 +27,22 @@ func (p Point64) Div(scalar float64) Point64 {
 	return Point64{X: p.X / scalar, Y: p.Y / scalar}
 }
 
+func (p Point64) Dot(o Point64) float64 {
+	return p.X*o.X + p.Y*o.Y
+}
+
 func (p Point64) Equal(o Point64) bool {
 	return p.X == o.X && p.Y == o.Y
 }
 
 func (p Point64) Length() float64 {
-	return (p.X*p.X + p.Y*p.Y)
+	return math.Sqrt(p.X*p.X + p.Y*p.Y)
 }
 
 func (p Point64) Distance(o Point64) float64 {
 	dx := p.X - o.X
 	dy := p.Y - o.Y
-	return (dx*dx + dy*dy)
+	return math.Sqrt(dx*dx + dy*dy)
 }
 
 func (p Point64) Normalized() Point64 {

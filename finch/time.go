@@ -23,21 +23,23 @@ func NewTime(targetFPS float64) *Time {
 }
 
 func (t *Time) start() {
-	now := float64(time.Now().UnixMilli())
+	now := float64(time.Now().UnixNano()) / 1_000_000.0 // Convert to milliseconds
 
 	t.startMS = now
 	t.currentMS = now
 }
 
 func (t *Time) tick() {
-	now := float64(time.Now().UnixMilli())
+	now := float64(time.Now().UnixNano()) / 1_000_000.0 // Convert to milliseconds
 	prev := t.currentMS
 
 	t.currentMS = now
-	t.deltaMS = now - prev
 
+	t.deltaMS = now - prev
 	if t.deltaMS < 0 {
 		t.deltaMS = 0
+	} else if t.deltaMS > 100 {
+		t.deltaMS = 100
 	}
 
 	t.elapsedMS += t.deltaMS
