@@ -206,6 +206,9 @@ func RegisterAssetFilesystem(root AssetRoot, filesystem fs.FS) error {
 }
 
 func GetAsset[T any](file AssetFile) (T, error) {
+	assetsMu.RLock()
+	defer assetsMu.RUnlock()
+
 	data, ok := assetCache[file]
 
 	if !ok {
@@ -237,7 +240,7 @@ func LoadAssets(files ...AssetFile) error {
 	requests := hashset.New[AssetFile]()
 	errs := make([]error, 0)
 
-	if err := build_asset_requests(requests, files); err != nil {
+	if err := buildAssetRequests(requests, files); err != nil {
 		errs = append(errs, err)
 	}
 
@@ -245,7 +248,7 @@ func LoadAssets(files ...AssetFile) error {
 		return errors.Join(errs...)
 	}
 
-	if err := load_asset_batches(linq.Batch(requests.ToSlice(), 100)); err != nil {
+	if err := loadAssetBatches(linq.Batch(requests.ToSlice(), 100)); err != nil {
 		errs = append(errs, err)
 	}
 
@@ -291,7 +294,7 @@ func MustUnloadAssets(files ...AssetFile) {
 	}
 }
 
-func build_asset_requests(requests hashset.Set[AssetFile], files []AssetFile) error {
+func buildAssetRequests(requests hashset.Set[AssetFile], files []AssetFile) error {
 	errs := make([]error, 0)
 
 	for _, file := range files {
@@ -317,9 +320,9 @@ func build_asset_requests(requests hashset.Set[AssetFile], files []AssetFile) er
 	return errors.Join(errs...)
 }
 
-func load_asset_batches(batches [][]AssetFile) error {
+func loadAssetBatches(batches [][]AssetFile) error {
 	if len(batches) == 1 {
-		return load_asset_batch(batches[0])
+		return loadAssetBatch(batches[0])
 	}
 
 	panicCh := make(chan error, len(batches))
@@ -336,7 +339,7 @@ func load_asset_batches(batches [][]AssetFile) error {
 				}
 			}()
 
-			if err := load_asset_batch(files); err != nil {
+			if err := loadAssetBatch(files); err != nil {
 				panicCh <- err
 			}
 		}(batch)
@@ -357,7 +360,7 @@ func load_asset_batches(batches [][]AssetFile) error {
 	return nil
 }
 
-func load_asset_batch(files []AssetFile) error {
+func loadAssetBatch(files []AssetFile) error {
 	if len(files) == 0 {
 		return nil
 	}
@@ -367,7 +370,7 @@ func load_asset_batch(files []AssetFile) error {
 	// Note: Errors don't interrupt loading subsequent assets.
 	// Instead all errors are returned to be handled upstream.
 	for _, file := range files {
-		if err := load_asset_file(file); err != nil {
+		if err := loadAssetFile(file); err != nil {
 			errs = append(errs, err)
 		}
 	}
@@ -375,8 +378,8 @@ func load_asset_batch(files []AssetFile) error {
 	return errors.Join(errs...)
 }
 
-func load_asset_file(file AssetFile) error {
-	if err := try_load(file); err != nil {
+func loadAssetFile(file AssetFile) error {
+	if err := tryLoad(file); err != nil {
 		return err
 	}
 
@@ -433,7 +436,7 @@ func load_asset_file(file AssetFile) error {
 	return nil
 }
 
-func try_load(file AssetFile) error {
+func tryLoad(file AssetFile) error {
 	assetsMu.Lock()
 	defer assetsMu.Unlock()
 

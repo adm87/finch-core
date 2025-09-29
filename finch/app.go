@@ -106,9 +106,9 @@ func (a *App) WithShutdown(shutdownFunc ShutdownFunc) *App {
 
 func (a *App) WithWindow(window *Window) *App {
 	a.window = window
-	a.ctx.Screen().set_target_size(window.Width, window.Height)
-	a.ctx.Screen().set_render_scale(window.RenderScale)
-	a.ctx.Screen().set_fullscreen(window.Fullscreen)
+	a.ctx.Screen().setTargetSize(window.Width, window.Height)
+	a.ctx.Screen().setRenderScale(window.RenderScale)
+	a.ctx.Screen().setFullscreen(window.Fullscreen)
 	return a
 }
 

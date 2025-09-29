@@ -43,24 +43,6 @@ func (s *Screen) RenderScale() float64 {
 	return s.renderScale
 }
 
-func (s *Screen) set_render_scale(scale float64) {
-	if scale <= 0 {
-		panic("render scale must be greater than 0")
-	}
-	s.renderScale = scale
-}
-
-func (s *Screen) set_target_size(width, height int) {
-	if width <= 0 {
-		panic("target width must be greater than 0")
-	}
-	if height <= 0 {
-		panic("target height must be greater than 0")
-	}
-	s.targetWidth = width
-	s.targetHeight = height
-}
-
 func (s *Screen) SetSize(width, height int) {
 	if width <= 0 {
 		panic("width must be greater than 0")
@@ -76,6 +58,24 @@ func (s *Screen) IsFullscreen() bool {
 	return s.fullscreen
 }
 
-func (s *Screen) set_fullscreen(fullscreen bool) {
+func (s *Screen) setRenderScale(scale float64) {
+	if scale <= 0 {
+		panic("render scale must be greater than 0")
+	}
+	s.renderScale = scale
+}
+
+func (s *Screen) setTargetSize(width, height int) {
+	if width <= 0 {
+		panic("target width must be greater than 0")
+	}
+	if height <= 0 {
+		panic("target height must be greater than 0")
+	}
+	s.targetWidth = width
+	s.targetHeight = height
+}
+
+func (s *Screen) setFullscreen(fullscreen bool) {
 	s.fullscreen = fullscreen
 }
