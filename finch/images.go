@@ -41,7 +41,7 @@ func RegisterImageAssetTypes() {
 	})
 }
 
-func Get(file AssetFile) (*ebiten.Image, error) {
+func GetImage(file AssetFile) (*ebiten.Image, error) {
 	img, err := GetAsset[*ebiten.Image](file)
 	if err != nil {
 		return nil, err
@@ -49,6 +49,6 @@ func Get(file AssetFile) (*ebiten.Image, error) {
 	return img, nil
 }
 
-func MustGet(file AssetFile) *ebiten.Image {
+func MustGetImage(file AssetFile) *ebiten.Image {
 	return MustGetAsset[*ebiten.Image](file)
 }

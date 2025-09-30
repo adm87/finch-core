@@ -8,6 +8,12 @@ func New[T comparable]() Set[T] {
 	return make(Set[T])
 }
 
+func From[T comparable](items ...T) Set[T] {
+	s := make(Set[T])
+	s.Add(items...)
+	return s
+}
+
 func (s Set[T]) Add(item ...T) {
 	for _, i := range item {
 		s[i] = Entry{}
