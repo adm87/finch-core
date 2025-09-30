@@ -8,9 +8,21 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
-func RegisterImageAssetManager() {
+const (
+	PngAssetType  = "png"
+	JpgAssetType  = "jpg"
+	JpegAssetType = "jpeg"
+	BmpAssetType  = "bmp"
+)
+
+func RegisterImageAssetTypes() {
 	RegisterAssetManager(&AssetManager{
-		AssetTypes: []AssetType{"png", "jpg", "jpeg", "bmp"},
+		AssetTypes: []AssetType{
+			PngAssetType,
+			JpgAssetType,
+			JpegAssetType,
+			BmpAssetType,
+		},
 		ProcessAssetFile: func(file AssetFile, data []byte) (any, error) {
 			img, _, err := ebitenutil.NewImageFromReader(bytes.NewReader(data))
 			if err != nil {

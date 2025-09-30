@@ -23,3 +23,14 @@ func DirectoryMustExist(path string) {
 		panic("not a directory: " + absPath)
 	}
 }
+
+func FileMustExist(path string) {
+	absPath := MakeAbsolute(path)
+	info, err := os.Stat(absPath)
+	if err != nil {
+		panic(err)
+	}
+	if info.IsDir() {
+		panic("not a file: " + absPath)
+	}
+}
