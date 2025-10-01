@@ -167,7 +167,7 @@ func HasAssetTypeSupport(t AssetType) bool {
 	return exists
 }
 
-func RegisterAssetManager(manager *AssetManager) error {
+func RegisterAssetImporter(manager *AssetManager) error {
 	if manager == nil {
 		return ErrAssetManagerNil
 	}

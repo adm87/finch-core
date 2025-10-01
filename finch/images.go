@@ -16,7 +16,7 @@ const (
 )
 
 func RegisterImageAssetTypes() {
-	RegisterAssetManager(&AssetManager{
+	RegisterAssetImporter(&AssetManager{
 		AssetTypes: []AssetType{
 			PngAssetType,
 			JpgAssetType,
