@@ -15,8 +15,8 @@ const (
 	BmpAssetType  = "bmp"
 )
 
-func RegisterImageAssetTypes() {
-	RegisterAssetImporter(&AssetManager{
+func RegisterImageAssetImport() {
+	RegisterAssetImporter(&AssetImporter{
 		AssetTypes: []AssetType{
 			PngAssetType,
 			JpgAssetType,

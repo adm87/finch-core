@@ -30,11 +30,11 @@ var (
 )
 
 // ======================================================
-// Asset Manager
+// Asset Importer
 // ======================================================
 
-// AssetManager managers allocation and deallocation of a specific asset types.
-type AssetManager struct {
+// AssetImporter manages allocation and deallocation of a specific asset types.
+type AssetImporter struct {
 	ProcessAssetFile AssetAllocator
 	CleanupAssetFile AssetDeallocator
 	AssetTypes       []AssetType
@@ -156,7 +156,7 @@ func (f AssetFile) MustGet() any {
 
 var (
 	assetCache       = make(map[AssetFile]any)
-	assetManagers    = make(map[AssetType]*AssetManager)
+	assetManagers    = make(map[AssetType]*AssetImporter)
 	assetFilesystems = make(map[AssetRoot]fs.FS)
 	assetsLoading    = hashset.New[AssetFile]()
 	assetsMu         = sync.RWMutex{}
@@ -167,7 +167,7 @@ func HasAssetTypeSupport(t AssetType) bool {
 	return exists
 }
 
-func RegisterAssetImporter(manager *AssetManager) error {
+func RegisterAssetImporter(manager *AssetImporter) error {
 	if manager == nil {
 		return ErrAssetManagerNil
 	}
