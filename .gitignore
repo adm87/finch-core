@@ -29,6 +29,9 @@
 !linq/
 !linq/**/*
 
+!partition/
+!partition/**/*
+
 !tmpl/
 !tmpl/**/*
 

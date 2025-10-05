@@ -33,3 +33,11 @@ func (r Rect64) ContainsXY(x, y float64) bool {
 func (r Rect64) Intersects(o Rect64) bool {
 	return r.X < o.X+o.Width && r.X+r.Width > o.X && r.Y < o.Y+o.Height && r.Y+r.Height > o.Y
 }
+
+func (r Rect64) Union(o Rect64) Rect64 {
+	minX := min(r.X, o.X)
+	minY := min(r.Y, o.Y)
+	maxX := max(r.X+r.Width, o.X+o.Width)
+	maxY := max(r.Y+r.Height, o.Y+o.Height)
+	return NewRect64(minX, minY, maxX-minX, maxY-minY)
+}
