@@ -55,6 +55,30 @@ func (qt *QuadTree[T]) Count() int {
 	return count
 }
 
+func (qt *QuadTree[T]) Resize(bounds geom.Rect64) {
+	if qt.bounds == bounds {
+		return
+	}
+
+	allObjects := hashset.New[T]()
+
+	qt.internalQuery(qt.bounds, allObjects)
+	qt.Clear()
+
+	qt.bounds = bounds
+	for o := range allObjects {
+		qt.Insert(o)
+	}
+}
+
+func (qt *QuadTree[T]) Min() (float64, float64) {
+	return qt.bounds.Min()
+}
+
+func (qt *QuadTree[T]) Max() (float64, float64) {
+	return qt.bounds.Max()
+}
+
 func (qt *QuadTree[T]) Insert(obj T) bool {
 	bounds := obj.Bounds()
 	if !bounds.Intersects(qt.bounds) {
@@ -118,7 +142,13 @@ func (qt *QuadTree[T]) Update(obj T) {
 
 func (qt *QuadTree[T]) Query(region geom.Rect64) hashset.Set[T] {
 	results := hashset.New[T]()
-	qt.internalQuery(region, &results)
+	qt.internalQuery(region, results)
+	return results
+}
+
+func (qt *QuadTree[T]) QueryNodes(region geom.Rect64) hashset.Set[*QuadTree[T]] {
+	results := hashset.New[*QuadTree[T]]()
+	qt.internalQueryNodes(region, results)
 	return results
 }
 
@@ -166,7 +196,7 @@ func (qt *QuadTree[T]) tryCollapse() {
 	}
 
 	allObjects := hashset.New[T]()
-	qt.internalQuery(qt.bounds, &allObjects)
+	qt.internalQuery(qt.bounds, allObjects)
 
 	if len(allObjects) <= qt.leafSize {
 		qt.objects = allObjects
@@ -176,7 +206,8 @@ func (qt *QuadTree[T]) tryCollapse() {
 		}
 	}
 }
-func (qt *QuadTree[T]) internalQuery(region geom.Rect64, results *hashset.Set[T]) {
+
+func (qt *QuadTree[T]) internalQuery(region geom.Rect64, results hashset.Set[T]) {
 	if !region.Intersects(qt.bounds) {
 		return
 	}
@@ -188,6 +219,20 @@ func (qt *QuadTree[T]) internalQuery(region geom.Rect64, results *hashset.Set[T]
 	if qt.isBranch() {
 		for _, node := range qt.nodes {
 			node.internalQuery(region, results)
+		}
+	}
+}
+
+func (qt *QuadTree[T]) internalQueryNodes(region geom.Rect64, results hashset.Set[*QuadTree[T]]) {
+	if !region.Intersects(qt.bounds) {
+		return
+	}
+
+	results.AddDistinct(qt)
+
+	if qt.isBranch() {
+		for _, node := range qt.nodes {
+			node.internalQueryNodes(region, results)
 		}
 	}
 }

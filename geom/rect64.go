@@ -41,3 +41,7 @@ func (r Rect64) Union(o Rect64) Rect64 {
 	maxY := max(r.Y+r.Height, o.Y+o.Height)
 	return NewRect64(minX, minY, maxX-minX, maxY-minY)
 }
+
+func (r Rect64) Expend(margin float64) Rect64 {
+	return NewRect64(r.X-margin, r.Y-margin, r.Width+2*margin, r.Height+2*margin)
+}
